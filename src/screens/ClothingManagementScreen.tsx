@@ -9,8 +9,12 @@ import { ClothingItem } from '../types/ClothingItem';
 import { removeBackground } from '../services/BackgroundRemoval';
 import { categorizeClothing } from '../services/ClothingCategorization';
 import { colors } from '../styles/colors';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ClosetStackParamList } from '../types/navigation';
 
-const ClothingManagementScreen = ({ navigation }) => {
+type Props = NativeStackScreenProps<ClosetStackParamList, 'ClothingManagement'>;
+
+const ClothingManagementScreen: React.FC<Props> = ({ navigation }) => {
   const context = useContext(ClothingContext);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -20,7 +24,7 @@ const ClothingManagementScreen = ({ navigation }) => {
 
   const { clothingItems, addClothingItem } = context;
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: ClothingItem }) => (
     <ClothingItemThumbnail
       item={item}
       onPress={() => navigation.navigate('ClothingDetail', { id: item.id })}
@@ -53,14 +57,14 @@ const ClothingManagementScreen = ({ navigation }) => {
     }
   };
 
-  const processImage = async (uri) => {
+  const processImage = async (uri: string) => {
     try {
       setIsProcessing(true);
 
       const bgRemovedUri = await removeBackground(uri);
       const aiData = await categorizeClothing(bgRemovedUri);
 
-      const newItem = {
+      const newItem: ClothingItem = {
         id: uuidv4(),
         imageUri: uri,
         backgroundRemovedImageUri: bgRemovedUri,
@@ -89,7 +93,7 @@ const ClothingManagementScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
+      <FlatList<ClothingItem>
         data={clothingItems}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
@@ -111,7 +115,7 @@ const ClothingManagementScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: colors.screen_background },
   listContent: {
     paddingBottom: 80,
   },
