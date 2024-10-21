@@ -9,6 +9,12 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../styles/colors';
 
+type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
+
+const BUTTON_SIZE = 60;
+const BUTTON_MARGIN = 16;
+const TOTAL_BUTTON_HEIGHT = BUTTON_SIZE + BUTTON_MARGIN;
+
 const AnimatedAddButton: React.FC<{
   onChoosePhoto: () => void;
   onTakePhoto: () => void;
@@ -17,25 +23,18 @@ const AnimatedAddButton: React.FC<{
   const [animation] = useState(new Animated.Value(0));
 
   const toggleMenu = () => {
-    if (isOpen) {
-      Animated.timing(animation, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => setIsOpen(false));
-    } else {
-      setIsOpen(true);
-      Animated.timing(animation, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    }
+    const toValue = isOpen ? 0 : 1;
+    setIsOpen(!isOpen);
+    Animated.timing(animation, {
+      toValue,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
   };
 
   const rotation = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '45deg'],
+    outputRange: ['0deg', '135deg'],
   });
 
   const opacity = animation.interpolate({
@@ -43,63 +42,80 @@ const AnimatedAddButton: React.FC<{
     outputRange: [0, 1],
   });
 
-  const screen = Dimensions.get('window');
+  const mainButtonColor = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [colors.primary_yellow, colors.light_yellow],
+  });
+
+  const renderOptionButton = (
+    icon: IconName,
+    label: string,
+    onPress: () => void,
+    translateY: Animated.AnimatedInterpolation<number>
+  ) => (
+    <Animated.View
+      style={[
+        styles.optionButton,
+        {
+          opacity,
+          transform: [{ translateY }],
+        },
+      ]}
+    >
+      <Animated.Text style={[styles.buttonLabel, { opacity }]}>{label}</Animated.Text>
+      <View style={[styles.circleButton, { backgroundColor: colors.primary_yellow }]}>
+        <TouchableOpacity onPress={onPress}>
+          <MaterialIcons name={icon} size={24} color={colors.icon_stroke} />
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
 
   return (
     <>
-      {/* Dimming Background */}
       {isOpen && (
         <TouchableOpacity
           style={styles.dimmedBackground}
           onPress={toggleMenu}
+          activeOpacity={1}
         />
       )}
 
-      {/* Additional Buttons */}
-      <Animated.View
-        style={[
-          styles.optionButton,
-          {
-            opacity,
-            transform: [{ translateY: animation.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, -120],
-            }) }],
-          },
-        ]}
-      >
-        <TouchableOpacity
-          style={styles.circleButton}
-          onPress={onChoosePhoto}
-        >
-          <MaterialIcons name="photo-library" size={24} color={colors.icon_stroke} />
-        </TouchableOpacity>
-      </Animated.View>
+      {renderOptionButton(
+        "photo-library",
+        "Choose from Photos",
+        onChoosePhoto,
+        animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, -TOTAL_BUTTON_HEIGHT * 2],
+        })
+      )}
+
+      {renderOptionButton(
+        "camera-alt",
+        "Camera",
+        onTakePhoto,
+        animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, -TOTAL_BUTTON_HEIGHT],
+        })
+      )}
 
       <Animated.View
         style={[
-          styles.optionButton,
+          styles.addButton,
           {
-            opacity,
-            transform: [{ translateY: animation.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, -60],
-            }) }],
+            backgroundColor: mainButtonColor,
+            transform: [{ rotate: rotation }],
           },
         ]}
       >
-        <TouchableOpacity
-          style={styles.circleButton}
-          onPress={onTakePhoto}
-        >
-          <MaterialIcons name="camera-alt" size={24} color={colors.icon_stroke} />
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Main Add/Cancel Button */}
-      <Animated.View style={[styles.addButton, { transform: [{ rotate: rotation }] }]}>
-        <TouchableOpacity onPress={toggleMenu}>
-          <MaterialIcons name="add" size={24} color={colors.icon_stroke} />
+        <TouchableOpacity onPress={toggleMenu} style={styles.mainButtonTouchable}>
+          <MaterialIcons
+            name="add"
+            size={26}
+            color={colors.icon_stroke}
+          />
         </TouchableOpacity>
       </Animated.View>
     </>
@@ -111,10 +127,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 30,
-    backgroundColor: colors.primary_yellow,
-    borderRadius: 30,
-    width: 60,
-    height: 60,
+    borderRadius: BUTTON_SIZE / 2,
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mainButtonTouchable: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -122,14 +143,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   circleButton: {
-    backgroundColor: colors.primary_yellow,
-    borderRadius: 30,
-    width: 50,
-    height: 50,
+    borderRadius: BUTTON_SIZE / 2,
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  buttonLabel: {
+    marginRight: 16,
+    color: colors.text_primary,
+    fontSize: 16,
   },
   dimmedBackground: {
     position: 'absolute',
@@ -137,8 +165,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#000',
-    opacity: 0.5,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 
