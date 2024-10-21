@@ -4,7 +4,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ClothingManagementScreen from '../screens/ClothingManagementScreen';
 import ClothingDetailScreen from '../screens/ClothingDetailScreen';
-import AddClothingItemScreen from '../screens/AddClothingItemScreen';
 import { ClosetStackParamList } from '../types/navigation';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -20,7 +19,6 @@ const ClosetStackScreen = () => (
   <ClosetStack.Navigator screenOptions={{ headerShown: false }}>
     <ClosetStack.Screen name="ClothingManagement" component={ClothingManagementScreen} />
     <ClosetStack.Screen name="ClothingDetail" component={ClothingDetailScreen} />
-    <ClosetStack.Screen name="AddClothingItemScreen" component={AddClothingItemScreen} />
   </ClosetStack.Navigator>
 );
 
