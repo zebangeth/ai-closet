@@ -63,11 +63,15 @@ const AnimatedAddButton: React.FC<{
       ]}
     >
       <Animated.Text style={[styles.buttonLabel, { opacity }]}>{label}</Animated.Text>
-      <View style={[styles.circleButton, { backgroundColor: colors.primary_yellow }]}>
-        <TouchableOpacity onPress={onPress}>
-          <MaterialIcons name={icon} size={24} color={colors.icon_stroke} />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={[styles.circleButton, { backgroundColor: colors.primary_yellow }]}
+        onPress={() => {
+          onPress();
+          toggleMenu();
+        }}
+      >
+        <MaterialIcons name={icon} size={24} color={colors.icon_stroke} />
+      </TouchableOpacity>
     </Animated.View>
   );
 
@@ -83,7 +87,7 @@ const AnimatedAddButton: React.FC<{
 
       {renderOptionButton(
         "photo-library",
-        "Choose from Photos",
+        "Add from Photos",
         onChoosePhoto,
         animation.interpolate({
           inputRange: [0, 1],
@@ -93,7 +97,7 @@ const AnimatedAddButton: React.FC<{
 
       {renderOptionButton(
         "camera-alt",
-        "Camera",
+        "Add by Camera",
         onTakePhoto,
         animation.interpolate({
           inputRange: [0, 1],
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonLabel: {
-    marginRight: 16,
+    marginRight: 10,
     color: colors.text_primary,
     fontSize: 16,
   },
