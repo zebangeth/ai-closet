@@ -1,77 +1,56 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { ClothingItem } from '../models/ClothingItem';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { ClothingItem } from '../types/ClothingItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { v4 as uuidv4 } from 'uuid';
 
-interface ClothingContextProps {
+type ClothingContextType = {
   clothingItems: ClothingItem[];
-  addClothingItem: (item: Omit<ClothingItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
-  updateClothingItem: (item: ClothingItem) => Promise<void>;
-  deleteClothingItem: (id: string) => Promise<void>;
-}
+  addClothingItem: (item: ClothingItem) => void;
+  updateClothingItem: (item: ClothingItem) => void;
+  deleteClothingItem: (id: string) => void;
+};
 
-export const ClothingContext = createContext<ClothingContextProps>({
-  clothingItems: [],
-  addClothingItem: async () => {},
-  updateClothingItem: async () => {},
-  deleteClothingItem: async () => {},
-});
+export const ClothingContext = createContext<ClothingContextType | null>(null);
 
-export const ClothingProvider: React.FC = ({ children }) => {
+export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
 
+  // Load clothing items from AsyncStorage on mount
   useEffect(() => {
+    const loadClothingItems = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@clothing_items');
+        jsonValue != null ? setClothingItems(JSON.parse(jsonValue)) : null;
+      } catch (e) {
+        console.error('Error loading clothing items:', e);
+      }
+    };
     loadClothingItems();
   }, []);
 
-  const loadClothingItems = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('@clothing_items');
-      if (jsonValue != null) {
-        setClothingItems(JSON.parse(jsonValue));
+  // Save clothing items to AsyncStorage whenever they change
+  useEffect(() => {
+    const saveClothingItems = async () => {
+      try {
+        await AsyncStorage.setItem('@clothing_items', JSON.stringify(clothingItems));
+      } catch (e) {
+        console.error('Error saving clothing items:', e);
       }
-    } catch (e) {
-      console.error('Failed to load clothing items.', e);
-    }
-  };
-
-  const saveClothingItems = async (items: ClothingItem[]) => {
-    try {
-      const jsonValue = JSON.stringify(items);
-      await AsyncStorage.setItem('@clothing_items', jsonValue);
-    } catch (e) {
-      console.error('Failed to save clothing items.', e);
-    }
-  };
-
-  const addClothingItem = async (
-    item: Omit<ClothingItem, 'id' | 'createdAt' | 'updatedAt'>,
-  ) => {
-    const newItem: ClothingItem = {
-      ...item,
-      id: uuidv4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
-    const updatedItems = [...clothingItems, newItem];
-    setClothingItems(updatedItems);
-    await saveClothingItems(updatedItems);
+    saveClothingItems();
+  }, [clothingItems]);
+
+  const addClothingItem = (item: ClothingItem) => {
+    setClothingItems([...clothingItems, item]);
   };
 
-  const updateClothingItem = async (item: ClothingItem) => {
-    const index = clothingItems.findIndex((i) => i.id === item.id);
-    if (index !== -1) {
-      const updatedItems = [...clothingItems];
-      updatedItems[index] = { ...item, updatedAt: new Date() };
-      setClothingItems(updatedItems);
-      await saveClothingItems(updatedItems);
-    }
+  const updateClothingItem = (updatedItem: ClothingItem) => {
+    setClothingItems(
+      clothingItems.map(item => (item.id === updatedItem.id ? updatedItem : item))
+    );
   };
 
-  const deleteClothingItem = async (id: string) => {
-    const updatedItems = clothingItems.filter((item) => item.id !== id);
-    setClothingItems(updatedItems);
-    await saveClothingItems(updatedItems);
+  const deleteClothingItem = (id: string) => {
+    setClothingItems(clothingItems.filter(item => item.id !== id));
   };
 
   return (
