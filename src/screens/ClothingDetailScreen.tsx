@@ -15,9 +15,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ClosetStackParamList } from '../types/navigation';
 import { ClothingItem } from '../types/ClothingItem';
 import { colors } from '../styles/colors';
+import CategoryPicker from '../components/common/CategoryPicker';
 import TagChips from '../components/common/TagChips';
+import SeasonToggle from '../components/common/SeasonToggle';
 import { MaterialIcons } from '@expo/vector-icons';
 import Header from '../components/common/Header';
+
 
 type Props = NativeStackScreenProps<ClosetStackParamList, 'ClothingDetail'>;
 
@@ -134,20 +137,22 @@ const ClothingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           {/* Category Field */}
           <View style={styles.field}>
             <Text style={styles.fieldLabel}>Category</Text>
+            <CategoryPicker
+              selectedCategory={item.category}
+              selectedSubcategory={item.subcategory}
+              onValueChange={(category, subcategory) => {
+                handleFieldChange('category', category);
+                handleFieldChange('subcategory', subcategory);
+              }}
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Category</Text>
             <TextInput
               style={styles.fieldInput}
               value={item.category}
               onChangeText={(text) => handleFieldChange('category', text)}
-            />
-          </View>
-
-          {/* Subcategory Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Subcategory</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.subcategory}
-              onChangeText={(text) => handleFieldChange('subcategory', text)}
             />
           </View>
 
@@ -162,6 +167,14 @@ const ClothingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
 
           {/* Season Field */}
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Season</Text>
+            <SeasonToggle
+              selectedSeasons={item.season}
+              onValueChange={(seasons) => handleFieldChange('season', seasons)}
+            />
+          </View>
+
           <View style={styles.field}>
             <Text style={styles.fieldLabel}>Season</Text>
             <TextInput
