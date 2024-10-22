@@ -1,4 +1,3 @@
-// components/common/TagChips.tsx
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
