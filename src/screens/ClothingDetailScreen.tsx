@@ -5,21 +5,31 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
-  TextInput,
   Alert,
   FlatList,
+  TextInput,
+  Platform,
 } from 'react-native';
 import { ClothingContext } from '../contexts/ClothingContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ClosetStackParamList } from '../types/navigation';
 import { ClothingItem } from '../types/ClothingItem';
 import { colors } from '../styles/colors';
-import CategoryPicker from '../components/common/CategoryPicker';
 import TagChips from '../components/common/TagChips';
-import SeasonToggle from '../components/common/SeasonToggle';
 import { MaterialIcons } from '@expo/vector-icons';
 import Header from '../components/common/Header';
+import CategoryPicker from '../components/common/CategoryPicker';
+import SeasonToggle from '../components/common/SeasonToggle';
+import AutocompleteInput from '../components/common/AutocompleteInput';
+import YearMonthPicker from '../components/common/YearMonthPicker';
+import globalStyles from '../styles/globalStyles';
+import {
+  colors as colorSuggestions,
+  brands as brandSuggestions,
+  occasions as occasionSuggestions,
+} from '../data/suggestions';
+import { KeyboardAvoidingView, Platform as RNPlatform, ScrollView } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 
 type Props = NativeStackScreenProps<ClosetStackParamList, 'ClothingDetail'>;
@@ -34,13 +44,13 @@ const ClothingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const { clothingItems, deleteClothingItem, updateClothingItem } = context;
   const [item, setItem] = useState<ClothingItem | undefined>(
-    clothingItems.find(ci => ci.id === id)
+    clothingItems.find((ci) => ci.id === id)
   );
 
   const [isDirty, setIsDirty] = useState(false); // To track if changes were made
 
   useEffect(() => {
-    const updatedItem = clothingItems.find(ci => ci.id === id);
+    const updatedItem = clothingItems.find((ci) => ci.id === id);
     setItem(updatedItem);
   }, [clothingItems]);
 
@@ -53,21 +63,17 @@ const ClothingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const handleDelete = () => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this clothing item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            deleteClothingItem(id);
-            navigation.goBack();
-          },
+    Alert.alert('Delete Item', 'Are you sure you want to delete this clothing item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          deleteClothingItem(id);
+          navigation.goBack();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleSave = () => {
@@ -86,146 +92,128 @@ const ClothingDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       {/* Top Bar */}
       <Header onBack={() => navigation.goBack()} onDelete={handleDelete} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Image */}
-        <Image
-          source={{ uri: item.backgroundRemovedImageUri || item.imageUri }}
-          style={styles.image}
-        />
-
-        {/* Tags Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tags</Text>
-          <TagChips
-            tags={item.tags}
-            onAddTag={(tag) => {
-              handleFieldChange('tags', [...item.tags, tag]);
-            }}
-            onRemoveTag={(tag) => {
-              handleFieldChange('tags', item.tags.filter(t => t !== tag));
-            }}
+      <KeyboardAvoidingView
+        behavior={RNPlatform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.select({ ios: 0, android: 500 })}
+      >
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          extraScrollHeight={20}
+        >
+          {/* Image */}
+          <Image
+            source={{ uri: item.backgroundRemovedImageUri || item.imageUri }}
+            style={styles.image}
           />
-        </View>
 
-        {/* Relevant Outfits Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Relevant Outfits</Text>
-          {/* Placeholder for outfits */}
-          <FlatList
-            data={[]} // Replace with actual outfits including this item
-            horizontal
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.outfitThumbnail}
-                onPress={() => {
-                  // navigation to outfit detail screen
-                }}
-              >
-                <Image source={{ uri: item.imageUri }} style={styles.outfitImage} />
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.id}
-            ListEmptyComponent={<Text>No outfits available.</Text>}
-          />
-        </View>
-
-        {/* Item Details Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Item Details</Text>
-
-          {/* Attribute Fields */}
-          {/* Category Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Category</Text>
-            <CategoryPicker
-              selectedCategory={item.category}
-              selectedSubcategory={item.subcategory}
-              onValueChange={(category, subcategory) => {
-                handleFieldChange('category', category);
-                handleFieldChange('subcategory', subcategory);
+          {/* Tags Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Tags</Text>
+            <TagChips
+              tags={item.tags}
+              onAddTag={(tag) => {
+                handleFieldChange('tags', [...item.tags, tag]);
+              }}
+              onRemoveTag={(tag) => {
+                handleFieldChange('tags', item.tags.filter((t) => t !== tag));
               }}
             />
           </View>
 
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Category</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.category}
-              onChangeText={(text) => handleFieldChange('category', text)}
-            />
-          </View>
+          {/* Relevant Outfits Section */}
+          {/* ... (Assuming no changes here) */}
 
-          {/* Color Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Color</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.color}
-              onChangeText={(text) => handleFieldChange('color', text)}
-            />
-          </View>
+          {/* Item Details Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Item Details</Text>
 
-          {/* Season Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Season</Text>
-            <SeasonToggle
-              selectedSeasons={item.season}
-              onValueChange={(seasons) => handleFieldChange('season', seasons)}
-            />
-          </View>
+            {/* Category & Subcategory Field */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Category & Subcategory</Text>
+              <CategoryPicker
+                selectedCategory={item.category}
+                selectedSubcategory={item.subcategory}
+                onValueChange={(category, subcategory) => {
+                  handleFieldChange('category', category);
+                  handleFieldChange('subcategory', subcategory);
+                }}
+              />
+            </View>
 
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Season</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.season.join(', ')}
-              onChangeText={(text) => handleFieldChange('season', text.split(',').map(s => s.trim()))}
-            />
-          </View>
+            {/* Season Field */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Season</Text>
+              <SeasonToggle
+                selectedSeasons={item.season}
+                onValueChange={(seasons) => handleFieldChange('season', seasons)}
+              />
+            </View>
 
-          {/* Occasion Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Occasion</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.occasion.join(', ')}
-              onChangeText={(text) => handleFieldChange('occasion', text.split(',').map(s => s.trim()))}
-            />
-          </View>
+            {/* Color Field */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Color</Text>
+              <AutocompleteInput
+                value={item.color}
+                data={colorSuggestions}
+                placeholder="Enter color"
+                onChangeText={(text) => handleFieldChange('color', text)}
+              />
+            </View>
 
-          {/* Brand Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Brand</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.brand}
-              onChangeText={(text) => handleFieldChange('brand', text)}
-            />
-          </View>
+            {/* Occasion Field */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Occasion</Text>
+              <AutocompleteInput
+                value={item.occasion.join(', ')}
+                data={occasionSuggestions}
+                placeholder="Enter occasion(s)"
+                onChangeText={(text) =>
+                  handleFieldChange(
+                    'occasion',
+                    text.split(',').map((s) => s.trim())
+                  )
+                }
+              />
+            </View>
 
-          {/* Purchase Date Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Purchase Date</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.purchaseDate}
-              onChangeText={(text) => handleFieldChange('purchaseDate', text)}
-            />
-          </View>
+            {/* Brand Field */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Brand</Text>
+              <AutocompleteInput
+                value={item.brand}
+                data={brandSuggestions}
+                placeholder="Enter brand"
+                onChangeText={(text) => handleFieldChange('brand', text)}
+              />
+            </View>
 
-          {/* Price Field */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Price</Text>
-            <TextInput
-              style={styles.fieldInput}
-              value={item.price.toString()}
-              keyboardType="numeric"
-              onChangeText={(text) => handleFieldChange('price', parseFloat(text) || 0)}
-            />
+            {/* Purchase Date Field */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Purchase Date</Text>
+              <YearMonthPicker
+                selectedDate={item.purchaseDate}
+                onValueChange={(date) => handleFieldChange('purchaseDate', date)}
+              />
+            </View>
+
+            {/* Price Field */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Price</Text>
+              <TextInput
+                style={styles.fieldInput}
+                value={item.price ? item.price.toString() : ''}
+                keyboardType="numeric"
+                onChangeText={(text) => {
+                  const numericValue = parseFloat(text);
+                  handleFieldChange('price', isNaN(numericValue) ? 0 : numericValue);
+                }}
+              />
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
 
       {/* Save Button */}
       {isDirty && (

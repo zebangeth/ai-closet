@@ -1,63 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-  Platform,
-} from 'react-native';
-import { categories } from '../../data/categories';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
 type Props = {
-  selectedCategory: string;
-  selectedSubcategory: string;
-  onValueChange: (category: string, subcategory: string) => void;
+  selectedDate: string; // Format: 'YYYY-MM'
+  onValueChange: (date: string) => void;
 };
 
-type CategoryKey = keyof typeof categories;
+const months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
 
-const categoryIcons: { [key in CategoryKey]: React.ComponentProps<typeof MaterialCommunityIcons>['name'] } = {
-  Tops: 'tshirt-crew',
-  Pants: 'roller-skate-off',
-  Skirts: 'tshirt-crew',
-  Dresses: 'tshirt-crew',
-  Shoes: 'shoe-formal',
-  Bags: 'bag-personal',
-  Hats: 'hat-fedora',
-  Jewelry: 'diamond-stone',
-  Accessories: 'sunglasses',
-};
-
-const CategoryPicker: React.FC<Props> = ({ selectedCategory, selectedSubcategory, onValueChange }) => {
+const YearMonthPicker: React.FC<Props> = ({ selectedDate, onValueChange }) => {
   const [isModalVisible, setModalVisible] = useState(false);
-  const [tempCategory, setTempCategory] = useState<CategoryKey>(selectedCategory as CategoryKey || '');
-  const [tempSubcategory, setTempSubcategory] = useState(selectedSubcategory || '');
-
-  useEffect(() => {
-    if (isModalVisible) {
-      setTempCategory(selectedCategory as CategoryKey || '');
-      setTempSubcategory(selectedSubcategory || '');
-    }
-  }, [isModalVisible]);
-
-  const handleCategorySelect = (category: CategoryKey) => {
-    setTempCategory(category);
-    setTempSubcategory(categories[category][0]);
-  };
+  const [tempMonth, setTempMonth] = useState<number>(new Date().getMonth());
+  const [tempYear, setTempYear] = useState<number>(new Date().getFullYear());
 
   const handleConfirm = () => {
-    onValueChange(tempCategory, tempSubcategory);
+    const month = tempMonth + 1; // Months are zero-indexed
+    const formattedMonth = month < 10 ? `0${month}` : month;
+    onValueChange(`${tempYear}-${formattedMonth}`);
     setModalVisible(false);
   };
+
+  const years = [];
+  const currentYear = new Date().getFullYear();
+  for (let i = currentYear; i >= currentYear - 50; i--) {
+    years.push(i);
+  }
 
   return (
     <View>
       <TouchableOpacity style={styles.inputField} onPress={() => setModalVisible(true)}>
         <Text style={styles.inputText}>
-          {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : 'Select Category'}
+          {selectedDate ? selectedDate : 'Select Purchase Date'}
         </Text>
       </TouchableOpacity>
 
@@ -69,50 +45,52 @@ const CategoryPicker: React.FC<Props> = ({ selectedCategory, selectedSubcategory
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Text style={styles.headerButton}>Cancel</Text>
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Select Category</Text>
+              <Text style={styles.headerTitle}>Select Purchase Date</Text>
               <TouchableOpacity onPress={handleConfirm}>
                 <Text style={styles.headerButton}>Confirm</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.pickerContent}>
-              {/* Category List */}
+              {/* Month Picker */}
               <View style={styles.pickerContainer}>
                 <FlatList
-                  data={Object.keys(categories)}
+                  data={months}
                   keyExtractor={(item) => item}
-                  renderItem={({ item }) => (
+                  initialScrollIndex={tempMonth}
+                  getItemLayout={(data, index) => (
+                    { length: 40, offset: 40 * index, index }
+                  )}
+                  renderItem={({ item, index }) => (
                     <TouchableOpacity
                       style={[
                         styles.pickerItem,
-                        tempCategory === item && styles.pickerItemSelected,
+                        tempMonth === index && styles.pickerItemSelected,
                       ]}
-                      onPress={() => handleCategorySelect(item as CategoryKey)}
+                      onPress={() => setTempMonth(index)}
                     >
-                      <MaterialCommunityIcons
-                        name={categoryIcons[item as CategoryKey]}
-                        size={24}
-                        color="black"
-                        style={styles.icon}
-                      />
                       <Text style={styles.pickerItemText}>{item}</Text>
                     </TouchableOpacity>
                   )}
                 />
               </View>
 
-              {/* Subcategory List */}
+              {/* Year Picker */}
               <View style={styles.pickerContainer}>
                 <FlatList
-                  data={categories[tempCategory]}
-                  keyExtractor={(item) => item}
+                  data={years}
+                  keyExtractor={(item) => item.toString()}
+                  initialScrollIndex={0}
+                  getItemLayout={(data, index) => (
+                    { length: 40, offset: 40 * index, index }
+                  )}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={[
                         styles.pickerItem,
-                        tempSubcategory === item && styles.pickerItemSelected,
+                        tempYear === item && styles.pickerItemSelected,
                       ]}
-                      onPress={() => setTempSubcategory(item)}
+                      onPress={() => setTempYear(item)}
                     >
                       <Text style={styles.pickerItemText}>{item}</Text>
                     </TouchableOpacity>
@@ -164,7 +142,7 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     fontSize: 16,
-    color: '#007aff', // iOS default blue color
+    color: '#007aff',
   },
   pickerContent: {
     flexDirection: 'row',
@@ -174,7 +152,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pickerItem: {
-    flexDirection: 'row',
     padding: 12,
     alignItems: 'center',
   },
@@ -183,11 +160,7 @@ const styles = StyleSheet.create({
   },
   pickerItemText: {
     fontSize: 16,
-    marginLeft: 8,
-  },
-  icon: {
-    marginRight: 8,
   },
 });
 
-export default CategoryPicker;
+export default YearMonthPicker;
