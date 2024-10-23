@@ -12,9 +12,7 @@ type ClothingContextType = {
 
 export const ClothingContext = createContext<ClothingContextType | null>(null);
 
-export const ClothingProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
 
   // Load clothing items from AsyncStorage on mount
@@ -36,10 +34,7 @@ export const ClothingProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const saveClothingItems = async () => {
       try {
-        await AsyncStorage.setItem(
-          "@clothing_items",
-          JSON.stringify(clothingItems)
-        );
+        await AsyncStorage.setItem("@clothing_items", JSON.stringify(clothingItems));
       } catch (e) {
         console.error("Error saving clothing items:", e);
       }
@@ -58,9 +53,7 @@ export const ClothingProvider: React.FC<{ children: ReactNode }> = ({
   const updateClothingItem = (updatedItem: ClothingItem) => {
     setClothingItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === updatedItem.id
-          ? { ...updatedItem, updatedAt: new Date().toISOString() }
-          : item
+        item.id === updatedItem.id ? { ...updatedItem, updatedAt: new Date().toISOString() } : item
       )
     );
   };

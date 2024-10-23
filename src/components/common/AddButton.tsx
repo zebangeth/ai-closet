@@ -1,7 +1,7 @@
-import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { colors } from '../../styles/colors';
+import React from "react";
+import { TouchableOpacity, StyleSheet } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { colors } from "../../styles/colors";
 
 const AddButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity style={styles.button} onPress={onPress}>
@@ -11,15 +11,15 @@ const AddButton = ({ onPress }: { onPress: () => void }) => (
 
 const styles = StyleSheet.create({
   button: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 30,
     backgroundColor: colors.primary_yellow,
     borderRadius: 30,
     width: 60,
     height: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

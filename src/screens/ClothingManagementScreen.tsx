@@ -1,12 +1,5 @@
 import React, { useContext, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { v4 as uuidv4 } from "uuid";
 import { ClothingContext } from "../contexts/ClothingContext";
@@ -21,7 +14,7 @@ import { ClosetStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<ClosetStackParamList, "ClothingManagement">;
 
-const ClothingManagementScreen: React.FC<Props> = ({ navigation }) => {
+const ClothingManagementScreen = ({ navigation }: Props) => {
   const context = useContext(ClothingContext);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -32,20 +25,13 @@ const ClothingManagementScreen: React.FC<Props> = ({ navigation }) => {
   const { clothingItems, addClothingItem } = context;
 
   const renderItem = ({ item }: { item: ClothingItem }) => (
-    <ClothingItemThumbnail
-      item={item}
-      onPress={() => navigation.navigate("ClothingDetail", { id: item.id })}
-    />
+    <ClothingItemThumbnail item={item} onPress={() => navigation.navigate("ClothingDetail", { id: item.id })} />
   );
 
   const handleChoosePhoto = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      Alert.alert(
-        "Permission Required",
-        "Permission to access gallery is required!"
-      );
+      Alert.alert("Permission Required", "Permission to access gallery is required!");
       return;
     }
 
@@ -58,10 +44,7 @@ const ClothingManagementScreen: React.FC<Props> = ({ navigation }) => {
   const handleTakePhoto = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (!permissionResult.granted) {
-      Alert.alert(
-        "Permission Required",
-        "Permission to access camera is required!"
-      );
+      Alert.alert("Permission Required", "Permission to access camera is required!");
       return;
     }
 
@@ -114,10 +97,7 @@ const ClothingManagementScreen: React.FC<Props> = ({ navigation }) => {
         numColumns={3}
         contentContainerStyle={styles.listContent}
       />
-      <AnimatedAddButton
-        onChoosePhoto={handleChoosePhoto}
-        onTakePhoto={handleTakePhoto}
-      />
+      <AnimatedAddButton onChoosePhoto={handleChoosePhoto} onTakePhoto={handleTakePhoto} />
       {isProcessing && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={colors.primary_yellow} />

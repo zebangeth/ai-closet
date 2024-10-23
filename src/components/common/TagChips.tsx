@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { colors } from '../../styles/colors';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  FlatList,
+} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { colors } from "../../styles/colors";
 
 type Props = {
   tags: string[];
@@ -9,14 +16,14 @@ type Props = {
   onRemoveTag: (tag: string) => void;
 };
 
-const TagChips: React.FC<Props> = ({ tags, onAddTag, onRemoveTag }) => {
-  const [newTag, setNewTag] = useState('');
+const TagChips = ({ tags, onAddTag, onRemoveTag }: Props) => {
+  const [newTag, setNewTag] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddTag = () => {
     if (newTag.trim()) {
       onAddTag(newTag.trim());
-      setNewTag('');
+      setNewTag("");
       setIsAdding(false);
     }
   };
@@ -47,7 +54,11 @@ const TagChips: React.FC<Props> = ({ tags, onAddTag, onRemoveTag }) => {
                 autoFocus
               />
               <TouchableOpacity onPress={handleAddTag}>
-                <MaterialIcons name="check" size={24} color={colors.primary_yellow} />
+                <MaterialIcons
+                  name="check"
+                  size={24}
+                  color={colors.primary_yellow}
+                />
               </TouchableOpacity>
             </View>
           ) : (
@@ -55,7 +66,11 @@ const TagChips: React.FC<Props> = ({ tags, onAddTag, onRemoveTag }) => {
               style={styles.addButton}
               onPress={() => setIsAdding(true)}
             >
-              <MaterialIcons name="add" size={24} color={colors.primary_yellow} />
+              <MaterialIcons
+                name="add"
+                size={24}
+                color={colors.primary_yellow}
+              />
               <Text style={styles.addButtonText}>Add Tag</Text>
             </TouchableOpacity>
           )
@@ -67,33 +82,33 @@ const TagChips: React.FC<Props> = ({ tags, onAddTag, onRemoveTag }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   chip: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.primary_yellow,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginRight: 8,
   },
   chipText: {
-    color: '#fff',
+    color: "#fff",
     marginRight: 4,
   },
   addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   addButtonText: {
     color: colors.primary_yellow,
     marginLeft: 4,
   },
   addChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderColor: colors.primary_yellow,
     borderWidth: 1,
     borderRadius: 16,

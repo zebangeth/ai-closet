@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, { useState } from "react";
+import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList, Pressable } from "react-native";
 
 type Props = {
   selectedDate: string; // Format: 'YYYY-MM'
@@ -7,11 +7,21 @@ type Props = {
 };
 
 const months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
-const YearMonthPicker: React.FC<Props> = ({ selectedDate, onValueChange }) => {
+const YearMonthPicker = ({ selectedDate, onValueChange }: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [tempMonth, setTempMonth] = useState<number>(new Date().getMonth());
   const [tempYear, setTempYear] = useState<number>(new Date().getFullYear());
@@ -25,20 +35,18 @@ const YearMonthPicker: React.FC<Props> = ({ selectedDate, onValueChange }) => {
 
   const years = [];
   const currentYear = new Date().getFullYear();
-  for (let i = currentYear; i >= currentYear - 50; i--) {
+  for (let i = currentYear; i >= 2000; i--) {
     years.push(i);
   }
 
   return (
     <View>
       <TouchableOpacity style={styles.inputField} onPress={() => setModalVisible(true)}>
-        <Text style={styles.inputText}>
-          {selectedDate ? selectedDate : 'Select Purchase Date'}
-        </Text>
+        <Text style={styles.inputText}>{selectedDate ? selectedDate : "Select Purchase Date"}</Text>
       </TouchableOpacity>
 
       <Modal visible={isModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
+        <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             {/* Header Bar */}
             <View style={styles.headerBar}>
@@ -58,15 +66,14 @@ const YearMonthPicker: React.FC<Props> = ({ selectedDate, onValueChange }) => {
                   data={months}
                   keyExtractor={(item) => item}
                   initialScrollIndex={tempMonth}
-                  getItemLayout={(data, index) => (
-                    { length: 40, offset: 40 * index, index }
-                  )}
+                  getItemLayout={(data, index) => ({
+                    length: 40,
+                    offset: 40 * index,
+                    index,
+                  })}
                   renderItem={({ item, index }) => (
                     <TouchableOpacity
-                      style={[
-                        styles.pickerItem,
-                        tempMonth === index && styles.pickerItemSelected,
-                      ]}
+                      style={[styles.pickerItem, tempMonth === index && styles.pickerItemSelected]}
                       onPress={() => setTempMonth(index)}
                     >
                       <Text style={styles.pickerItemText}>{item}</Text>
@@ -81,15 +88,14 @@ const YearMonthPicker: React.FC<Props> = ({ selectedDate, onValueChange }) => {
                   data={years}
                   keyExtractor={(item) => item.toString()}
                   initialScrollIndex={0}
-                  getItemLayout={(data, index) => (
-                    { length: 40, offset: 40 * index, index }
-                  )}
+                  getItemLayout={(data, index) => ({
+                    length: 40,
+                    offset: 40 * index,
+                    index,
+                  })}
                   renderItem={({ item }) => (
                     <TouchableOpacity
-                      style={[
-                        styles.pickerItem,
-                        tempYear === item && styles.pickerItemSelected,
-                      ]}
+                      style={[styles.pickerItem, tempYear === item && styles.pickerItemSelected]}
                       onPress={() => setTempYear(item)}
                     >
                       <Text style={styles.pickerItemText}>{item}</Text>
@@ -99,7 +105,7 @@ const YearMonthPicker: React.FC<Props> = ({ selectedDate, onValueChange }) => {
               </View>
             </View>
           </View>
-        </View>
+        </Pressable>
       </Modal>
     </View>
   );
@@ -108,44 +114,43 @@ const YearMonthPicker: React.FC<Props> = ({ selectedDate, onValueChange }) => {
 const styles = StyleSheet.create({
   inputField: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 4,
     padding: 8,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   inputText: {
     fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+    justifyContent: "flex-end",
   },
   modalContainer: {
-    height: '50%', // Take half the screen
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    height: "40%", // Take half the screen
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   headerBar: {
     height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   headerButton: {
     fontSize: 16,
-    color: '#007aff',
+    color: "#007aff",
   },
   pickerContent: {
-    flexDirection: 'row',
+    flexDirection: "row",
     flex: 1,
   },
   pickerContainer: {
@@ -153,10 +158,10 @@ const styles = StyleSheet.create({
   },
   pickerItem: {
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   pickerItemSelected: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   pickerItemText: {
     fontSize: 16,

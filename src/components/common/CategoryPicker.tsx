@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-  Platform,
-} from "react-native";
+import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList, Pressable } from "react-native";
 import { categories } from "../../data/categories";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -19,11 +11,7 @@ type Props = {
 
 type CategoryKey = keyof typeof categories;
 
-const categoryIcons: {
-  [key in CategoryKey]: React.ComponentProps<
-    typeof MaterialCommunityIcons
-  >["name"];
-} = {
+const categoryIcons: { [key in CategoryKey]: React.ComponentProps<typeof MaterialCommunityIcons>["name"] } = {
   Tops: "tshirt-crew",
   Pants: "roller-skate-off",
   Skirts: "tshirt-crew",
@@ -35,18 +23,10 @@ const categoryIcons: {
   Accessories: "sunglasses",
 };
 
-const CategoryPicker: React.FC<Props> = ({
-  selectedCategory,
-  selectedSubcategory,
-  onValueChange,
-}) => {
+const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
-  const [tempCategory, setTempCategory] = useState<CategoryKey>(
-    (selectedCategory as CategoryKey) || ""
-  );
-  const [tempSubcategory, setTempSubcategory] = useState(
-    selectedSubcategory || ""
-  );
+  const [tempCategory, setTempCategory] = useState<CategoryKey>((selectedCategory as CategoryKey) || "");
+  const [tempSubcategory, setTempSubcategory] = useState(selectedSubcategory || "");
 
   useEffect(() => {
     if (isModalVisible) {
@@ -67,19 +47,14 @@ const CategoryPicker: React.FC<Props> = ({
 
   return (
     <View>
-      <TouchableOpacity
-        style={styles.inputField}
-        onPress={() => setModalVisible(true)}
-      >
+      <TouchableOpacity style={styles.inputField} onPress={() => setModalVisible(true)}>
         <Text style={styles.inputText}>
-          {selectedCategory
-            ? `${selectedCategory} - ${selectedSubcategory}`
-            : "Select Category"}
+          {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : "Select Category"}
         </Text>
       </TouchableOpacity>
 
       <Modal visible={isModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
+        <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             {/* Header Bar */}
             <View style={styles.headerBar}>
@@ -100,10 +75,7 @@ const CategoryPicker: React.FC<Props> = ({
                   keyExtractor={(item) => item}
                   renderItem={({ item }) => (
                     <TouchableOpacity
-                      style={[
-                        styles.pickerItem,
-                        tempCategory === item && styles.pickerItemSelected,
-                      ]}
+                      style={[styles.pickerItem, tempCategory === item && styles.pickerItemSelected]}
                       onPress={() => handleCategorySelect(item as CategoryKey)}
                     >
                       <MaterialCommunityIcons
@@ -125,10 +97,7 @@ const CategoryPicker: React.FC<Props> = ({
                   keyExtractor={(item) => item}
                   renderItem={({ item }) => (
                     <TouchableOpacity
-                      style={[
-                        styles.pickerItem,
-                        tempSubcategory === item && styles.pickerItemSelected,
-                      ]}
+                      style={[styles.pickerItem, tempSubcategory === item && styles.pickerItemSelected]}
                       onPress={() => setTempSubcategory(item)}
                     >
                       <Text style={styles.pickerItemText}>{item}</Text>
@@ -138,7 +107,7 @@ const CategoryPicker: React.FC<Props> = ({
               </View>
             </View>
           </View>
-        </View>
+        </Pressable>
       </Modal>
     </View>
   );
@@ -158,13 +127,12 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background
   },
   modalContainer: {
-    height: "50%", // Take half the screen
+    height: "40%", // Take half the screen
     backgroundColor: "#fff",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   headerBar: {
     height: 50,

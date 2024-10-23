@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Dimensions,
-} from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { colors } from '../../styles/colors';
+import React, { useState } from "react";
+import { StyleSheet, Animated, Pressable } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { colors } from "../../styles/colors";
 
-type IconName = React.ComponentProps<typeof MaterialIcons>['name'];
+type IconName = React.ComponentProps<typeof MaterialIcons>["name"];
 
 const BUTTON_SIZE = 60;
 const BUTTON_MARGIN = 16;
 const TOTAL_BUTTON_HEIGHT = BUTTON_SIZE + BUTTON_MARGIN;
 
-const AnimatedAddButton: React.FC<{
+const AnimatedAddButton = ({
+  onChoosePhoto,
+  onTakePhoto,
+}: {
   onChoosePhoto: () => void;
   onTakePhoto: () => void;
-}> = ({ onChoosePhoto, onTakePhoto }) => {
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [animation] = useState(new Animated.Value(0));
 
@@ -34,7 +31,7 @@ const AnimatedAddButton: React.FC<{
 
   const rotation = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '135deg'],
+    outputRange: ["0deg", "135deg"],
   });
 
   const opacity = animation.interpolate({
@@ -62,26 +59,31 @@ const AnimatedAddButton: React.FC<{
         },
       ]}
     >
-      <Animated.Text style={[styles.buttonLabel, { opacity }]}>{label}</Animated.Text>
-      <TouchableOpacity
-        style={[styles.circleButton, { backgroundColor: colors.primary_yellow }]}
+      <Animated.Text style={[styles.buttonLabel, { opacity }]}>
+        {label}
+      </Animated.Text>
+      <Pressable
+        style={[
+          styles.circleButton,
+          { backgroundColor: colors.primary_yellow },
+        ]}
         onPress={() => {
           onPress();
           toggleMenu();
         }}
       >
         <MaterialIcons name={icon} size={24} color={colors.icon_stroke} />
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 
   return (
     <>
       {isOpen && (
-        <TouchableOpacity
+        <Pressable
           style={styles.dimmedBackground}
           onPress={toggleMenu}
-          activeOpacity={1}
+          android_ripple={{ color: "rgba(0,0,0,0.2)" }}
         />
       )}
 
@@ -114,13 +116,9 @@ const AnimatedAddButton: React.FC<{
           },
         ]}
       >
-        <TouchableOpacity onPress={toggleMenu} style={styles.mainButtonTouchable}>
-          <MaterialIcons
-            name="add"
-            size={26}
-            color={colors.icon_stroke}
-          />
-        </TouchableOpacity>
+        <Pressable onPress={toggleMenu} style={styles.mainButtonTouchable}>
+          <MaterialIcons name="add" size={26} color={colors.icon_stroke} />
+        </Pressable>
       </Animated.View>
     </>
   );
@@ -128,35 +126,35 @@ const AnimatedAddButton: React.FC<{
 
 const styles = StyleSheet.create({
   addButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 30,
     borderRadius: BUTTON_SIZE / 2,
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   mainButtonTouchable: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   optionButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   circleButton: {
     borderRadius: BUTTON_SIZE / 2,
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonLabel: {
     marginRight: 10,
@@ -164,7 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   dimmedBackground: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,

@@ -1,14 +1,20 @@
-import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native';
+import React from "react";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 
 type Props = {
   selectedSeasons: string[];
   onValueChange: (seasons: string[]) => void;
 };
 
-const seasons = ['Spring/Fall', 'Summer', 'Winter'];
+const seasons = ["Spring/Fall", "Summer", "Winter"];
 
-const SeasonToggle: React.FC<Props> = ({ selectedSeasons, onValueChange }) => {
+const SeasonToggle = ({ selectedSeasons, onValueChange }: Props) => {
   const toggleSeason = (season: string) => {
     let updatedSeasons = [...selectedSeasons];
     if (updatedSeasons.includes(season)) {
@@ -51,18 +57,18 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
   buttonSelected: {
-    backgroundColor: '#ffd700',
-    borderColor: '#ffd700',
+    backgroundColor: "#ffd700",
+    borderColor: "#ffd700",
   },
   buttonText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   buttonTextSelected: {
-    color: '#fff',
+    color: "#fff",
   },
 });
 
