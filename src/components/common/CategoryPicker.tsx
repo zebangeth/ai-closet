@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,9 +7,9 @@ import {
   StyleSheet,
   FlatList,
   Platform,
-} from 'react-native';
-import { categories } from '../../data/categories';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+} from "react-native";
+import { categories } from "../../data/categories";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type Props = {
   selectedCategory: string;
@@ -19,27 +19,39 @@ type Props = {
 
 type CategoryKey = keyof typeof categories;
 
-const categoryIcons: { [key in CategoryKey]: React.ComponentProps<typeof MaterialCommunityIcons>['name'] } = {
-  Tops: 'tshirt-crew',
-  Pants: 'roller-skate-off',
-  Skirts: 'tshirt-crew',
-  Dresses: 'tshirt-crew',
-  Shoes: 'shoe-formal',
-  Bags: 'bag-personal',
-  Hats: 'hat-fedora',
-  Jewelry: 'diamond-stone',
-  Accessories: 'sunglasses',
+const categoryIcons: {
+  [key in CategoryKey]: React.ComponentProps<
+    typeof MaterialCommunityIcons
+  >["name"];
+} = {
+  Tops: "tshirt-crew",
+  Pants: "roller-skate-off",
+  Skirts: "tshirt-crew",
+  Dresses: "tshirt-crew",
+  Shoes: "shoe-formal",
+  Bags: "bag-personal",
+  Hats: "hat-fedora",
+  Jewelry: "diamond-stone",
+  Accessories: "sunglasses",
 };
 
-const CategoryPicker: React.FC<Props> = ({ selectedCategory, selectedSubcategory, onValueChange }) => {
+const CategoryPicker: React.FC<Props> = ({
+  selectedCategory,
+  selectedSubcategory,
+  onValueChange,
+}) => {
   const [isModalVisible, setModalVisible] = useState(false);
-  const [tempCategory, setTempCategory] = useState<CategoryKey>(selectedCategory as CategoryKey || '');
-  const [tempSubcategory, setTempSubcategory] = useState(selectedSubcategory || '');
+  const [tempCategory, setTempCategory] = useState<CategoryKey>(
+    (selectedCategory as CategoryKey) || ""
+  );
+  const [tempSubcategory, setTempSubcategory] = useState(
+    selectedSubcategory || ""
+  );
 
   useEffect(() => {
     if (isModalVisible) {
-      setTempCategory(selectedCategory as CategoryKey || '');
-      setTempSubcategory(selectedSubcategory || '');
+      setTempCategory((selectedCategory as CategoryKey) || "");
+      setTempSubcategory(selectedSubcategory || "");
     }
   }, [isModalVisible]);
 
@@ -55,9 +67,14 @@ const CategoryPicker: React.FC<Props> = ({ selectedCategory, selectedSubcategory
 
   return (
     <View>
-      <TouchableOpacity style={styles.inputField} onPress={() => setModalVisible(true)}>
+      <TouchableOpacity
+        style={styles.inputField}
+        onPress={() => setModalVisible(true)}
+      >
         <Text style={styles.inputText}>
-          {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : 'Select Category'}
+          {selectedCategory
+            ? `${selectedCategory} - ${selectedSubcategory}`
+            : "Select Category"}
         </Text>
       </TouchableOpacity>
 
@@ -130,56 +147,56 @@ const CategoryPicker: React.FC<Props> = ({ selectedCategory, selectedSubcategory
 const styles = StyleSheet.create({
   inputField: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 4,
     padding: 8,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   inputText: {
     fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background
   },
   modalContainer: {
-    height: '50%', // Take half the screen
-    backgroundColor: '#fff',
+    height: "50%", // Take half the screen
+    backgroundColor: "#fff",
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
   headerBar: {
     height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   headerButton: {
     fontSize: 16,
-    color: '#007aff', // iOS default blue color
+    color: "#007aff", // iOS default blue color
   },
   pickerContent: {
-    flexDirection: 'row',
+    flexDirection: "row",
     flex: 1,
   },
   pickerContainer: {
     flex: 1,
   },
   pickerItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   pickerItemSelected: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   pickerItemText: {
     fontSize: 16,

@@ -1,9 +1,10 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { ClothingItem } from '../types/ClothingItem';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useEffect, ReactNode } from "react";
+import { ClothingItem } from "../types/ClothingItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type ClothingContextType = {
   clothingItems: ClothingItem[];
+  getClothingItem: (id: string) => ClothingItem | undefined;
   addClothingItem: (item: ClothingItem) => void;
   updateClothingItem: (item: ClothingItem) => void;
   deleteClothingItem: (id: string) => void;
@@ -11,17 +12,21 @@ type ClothingContextType = {
 
 export const ClothingContext = createContext<ClothingContextType | null>(null);
 
-export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ClothingProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
 
   // Load clothing items from AsyncStorage on mount
   useEffect(() => {
     const loadClothingItems = async () => {
       try {
-        const jsonValue = await AsyncStorage.getItem('@clothing_items');
-        jsonValue != null ? setClothingItems(JSON.parse(jsonValue)) : null;
+        const jsonValue = await AsyncStorage.getItem("@clothing_items");
+        if (jsonValue != null) {
+          setClothingItems(JSON.parse(jsonValue));
+        }
       } catch (e) {
-        console.error('Error loading clothing items:', e);
+        console.error("Error loading clothing items:", e);
       }
     };
     loadClothingItems();
@@ -31,31 +36,48 @@ export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }
   useEffect(() => {
     const saveClothingItems = async () => {
       try {
-        await AsyncStorage.setItem('@clothing_items', JSON.stringify(clothingItems));
+        await AsyncStorage.setItem(
+          "@clothing_items",
+          JSON.stringify(clothingItems)
+        );
       } catch (e) {
-        console.error('Error saving clothing items:', e);
+        console.error("Error saving clothing items:", e);
       }
     };
     saveClothingItems();
   }, [clothingItems]);
 
+  const getClothingItem = (id: string) => {
+    return clothingItems.find((item) => item.id === id);
+  };
+
   const addClothingItem = (item: ClothingItem) => {
-    setClothingItems([...clothingItems, item]);
+    setClothingItems((prevItems) => [...prevItems, item]);
   };
 
   const updateClothingItem = (updatedItem: ClothingItem) => {
-    setClothingItems(
-      clothingItems.map(item => (item.id === updatedItem.id ? updatedItem : item))
+    setClothingItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === updatedItem.id
+          ? { ...updatedItem, updatedAt: new Date().toISOString() }
+          : item
+      )
     );
   };
 
   const deleteClothingItem = (id: string) => {
-    setClothingItems(clothingItems.filter(item => item.id !== id));
+    setClothingItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   return (
     <ClothingContext.Provider
-      value={{ clothingItems, addClothingItem, updateClothingItem, deleteClothingItem }}
+      value={{
+        clothingItems,
+        getClothingItem,
+        addClothingItem,
+        updateClothingItem,
+        deleteClothingItem,
+      }}
     >
       {children}
     </ClothingContext.Provider>
