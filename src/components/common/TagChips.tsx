@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  FlatList,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 
@@ -31,13 +24,14 @@ const TagChips = ({ tags, onAddTag, onRemoveTag }: Props) => {
   return (
     <View style={styles.container}>
       <FlatList
+        style={{ paddingBottom: 8 }}
         data={tags}
         horizontal
         renderItem={({ item }) => (
           <View style={styles.chip}>
             <Text style={styles.chipText}>{item}</Text>
             <TouchableOpacity onPress={() => onRemoveTag(item)}>
-              <MaterialIcons name="close" size={16} color="#fff" />
+              <MaterialIcons name="close" size={16} color={colors.tag_light_text} />
             </TouchableOpacity>
           </View>
         )}
@@ -54,23 +48,12 @@ const TagChips = ({ tags, onAddTag, onRemoveTag }: Props) => {
                 autoFocus
               />
               <TouchableOpacity onPress={handleAddTag}>
-                <MaterialIcons
-                  name="check"
-                  size={24}
-                  color={colors.primary_yellow}
-                />
+                <MaterialIcons name="check" size={24} color={colors.primary_yellow} />
               </TouchableOpacity>
             </View>
           ) : (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => setIsAdding(true)}
-            >
-              <MaterialIcons
-                name="add"
-                size={24}
-                color={colors.primary_yellow}
-              />
+            <TouchableOpacity style={styles.addButton} onPress={() => setIsAdding(true)}>
+              <MaterialIcons name="add" size={24} color={colors.primary_yellow} />
               <Text style={styles.addButtonText}>Add Tag</Text>
             </TouchableOpacity>
           )
@@ -87,15 +70,15 @@ const styles = StyleSheet.create({
   },
   chip: {
     flexDirection: "row",
-    backgroundColor: colors.primary_yellow,
+    backgroundColor: colors.tag_light,
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 16,
+    paddingVertical: 6,
+    borderRadius: 10,
     alignItems: "center",
     marginRight: 8,
   },
   chipText: {
-    color: "#fff",
+    color: colors.tag_light_text,
     marginRight: 4,
   },
   addButton: {
@@ -111,9 +94,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderColor: colors.primary_yellow,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 4,
   },
   input: {
     minWidth: 60,

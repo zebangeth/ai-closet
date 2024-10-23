@@ -1,11 +1,7 @@
 import React from "react";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, ScrollView } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"; // Ensure you're using Expo or have react-native-vector-icons installed
+import { colors } from "../../styles/colors";
 
 type Props = {
   selectedSeasons: string[];
@@ -27,25 +23,23 @@ const SeasonToggle = ({ selectedSeasons, onValueChange }: Props) => {
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      {seasons.map((season) => (
-        <TouchableOpacity
-          key={season}
-          style={[
-            styles.button,
-            selectedSeasons.includes(season) && styles.buttonSelected,
-          ]}
-          onPress={() => toggleSeason(season)}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              selectedSeasons.includes(season) && styles.buttonTextSelected,
-            ]}
+      {seasons.map((season) => {
+        const isSelected = selectedSeasons.includes(season);
+        return (
+          <TouchableOpacity
+            key={season}
+            style={[styles.button, isSelected && styles.buttonSelected]}
+            onPress={() => toggleSeason(season)}
           >
-            {season}
-          </Text>
-        </TouchableOpacity>
-      ))}
+            <View style={styles.buttonContent}>
+              {isSelected && (
+                <MaterialIcons name="check" size={16} color={colors.tag_dark_text} style={styles.checkIcon} />
+              )}
+              <Text style={[styles.buttonText, isSelected && styles.buttonTextSelected]}>{season}</Text>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </ScrollView>
   );
 };
@@ -55,20 +49,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginRight: 8,
-    borderRadius: 20,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: colors.border_gray,
   },
   buttonSelected: {
-    backgroundColor: "#ffd700",
-    borderColor: "#ffd700",
+    backgroundColor: colors.tag_dark,
+    borderColor: colors.tag_dark,
   },
   buttonText: {
     fontSize: 16,
-    color: "#333",
+    color: colors.tag_light_text,
   },
   buttonTextSelected: {
-    color: "#fff",
+    color: colors.tag_dark_text,
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checkIcon: {
+    marginRight: 4,
   },
 });
 

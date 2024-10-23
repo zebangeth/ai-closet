@@ -155,7 +155,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
             <Text style={styles.sectionTitle}>Item Details</Text>
 
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Category & Subcategory</Text>
+              <Text style={styles.fieldLabel}>Category</Text>
               <CategoryPicker
                 selectedCategory={localItem.category}
                 selectedSubcategory={localItem.subcategory}
