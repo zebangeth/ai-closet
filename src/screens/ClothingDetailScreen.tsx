@@ -14,8 +14,7 @@ import {
   ScrollView,
 } from "react-native";
 import { ClothingContext } from "../contexts/ClothingContext";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { ClosetStackParamList } from "../types/navigation";
+import { ClothingDetailScreenProps as Props } from "../types/navigation";
 import { ClothingItem } from "../types/ClothingItem";
 import { colors } from "../styles/colors";
 import TagChips from "../components/common/TagChips";
@@ -28,8 +27,7 @@ import {
   brands as brandSuggestions,
   occasions as occasionSuggestions,
 } from "../data/suggestions";
-
-type Props = NativeStackScreenProps<ClosetStackParamList, "ClothingDetail">;
+import { typography } from "../styles/globalStyles";
 
 const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const { id } = route.params;
@@ -259,6 +257,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   sectionTitle: {
+    fontFamily: typography.bold,
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 8,
@@ -267,6 +266,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   fieldLabel: {
+    fontFamily: typography.medium,
     fontSize: 16,
     marginBottom: 4,
   },
