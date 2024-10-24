@@ -1,11 +1,14 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ClothingManagementScreen from '../screens/ClothingManagementScreen';
-import ClothingDetailScreen from '../screens/ClothingDetailScreen';
-import { ClosetStackParamList } from '../types/navigation';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import ClothingManagementScreen from "../screens/ClothingManagementScreen";
+import ClothingDetailScreen from "../screens/ClothingDetailScreen";
+import { ClosetStackParamList } from "../types/navigation";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Platform, StyleSheet } from "react-native";
+import { colors } from "../styles/colors";
+import { typography } from "../styles/globalStyles";
 
 const Tab = createBottomTabNavigator();
 const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
@@ -25,24 +28,67 @@ const ClosetStackScreen = () => (
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Tab.Navigator>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: styles.tabBar,
+          tabBarActiveTintColor: "#1C170D",
+          tabBarInactiveTintColor: "#9C854A",
+          tabBarLabelStyle: styles.tabBarLabel,
+          tabBarIconStyle: styles.tabBarIcon,
+        }}
+      >
         <Tab.Screen
           name="Closet"
           component={ClosetStackScreen}
-          options={{tabBarIcon: ({color, size}) => (
-          <MaterialCommunityIcons name="hanger" size={size} color={color} />)}}
+          options={{
+            tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="wardrobe" size={size} color={color} />,
+          }}
         />
         <Tab.Screen
           name="Outfits"
           component={OutfitManagementScreen}
-          options={{tabBarIcon: ({color, size}) => (
-          <MaterialIcons name="style" size={size} color={color} />)}}
+          options={{
+            tabBarIcon: ({ color, size }) => <MaterialIcons name="style" size={size} color={color} />,
+          }}
         />
-        <Tab.Screen name="Try-On" component={VirtualTryOnScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen
+          name="Try-On"
+          component={VirtualTryOnScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="wizard-hat" size={size} color={color} />,
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => <MaterialIcons name="person" size={size} color={color} />,
+          }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  tabBar: {
+    height: Platform.OS === "ios" ? 90 : 60,
+    paddingBottom: Platform.OS === "ios" ? 32 : 10,
+    paddingTop: 10,
+    backgroundColor: colors.screen_background,
+    borderTopColor: colors.divider_light,
+    borderTopWidth: 1,
+    elevation: 0, // Remove shadow on Android
+  },
+  tabBarLabel: {
+    fontFamily: typography.medium,
+    fontSize: 12,
+    marginTop: 4,
+  },
+  tabBarIcon: {
+    marginTop: 4,
+  },
+});
 
 export default AppNavigator;

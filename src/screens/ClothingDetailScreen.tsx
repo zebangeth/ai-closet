@@ -28,6 +28,7 @@ import {
   occasions as occasionSuggestions,
 } from "../data/suggestions";
 import { typography } from "../styles/globalStyles";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const { id } = route.params;
@@ -92,7 +93,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header
         onBack={() => {
           if (isDirty) {
@@ -117,11 +118,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
         onDelete={handleDelete}
       />
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-      >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="always" // Allows tapping on suggestions without dismissing the keyboard
@@ -133,8 +130,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
             style={styles.image}
           />
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Tags</Text>
+          <View style={[styles.section, { paddingTop: 14 }]}>
             <TagChips
               tags={localItem.tags}
               onAddTag={(tag) => {
@@ -236,7 +232,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
           <Text style={styles.saveButtonText}>Save</Text>
         </Pressable>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -246,24 +242,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.screen_background,
   },
   scrollContent: {
-    paddingBottom: 80,
+    paddingBottom: 60,
   },
   image: {
     width: "100%",
     aspectRatio: 1,
   },
   section: {
-    paddingHorizontal: 16,
     paddingVertical: 8,
   },
   sectionTitle: {
     fontFamily: typography.bold,
     fontSize: 18,
     fontWeight: "bold",
+    paddingHorizontal: 16,
     marginBottom: 8,
   },
   field: {
     marginBottom: 12,
+    paddingHorizontal: 16,
   },
   fieldLabel: {
     fontFamily: typography.medium,

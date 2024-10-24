@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import "react-native-get-random-values";
 import { useFonts } from "expo-font";
 import {
   PlusJakartaSans_400Regular,

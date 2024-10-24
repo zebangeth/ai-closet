@@ -1,13 +1,33 @@
 export const colors = [
-  'Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Pink', 'Purple', 'Gray',
-  'Brown', 'Orange', 'Mint Green', 'Navy', 'Beige', 'Khaki', 'Olive', 'Maroon',
+  "Black",
+  "White",
+  "Gray",
+  "Blue",
+  "Pink",
+  "Beige",
+  "Brown",
+  "Orange",
+  "Red",
+  "Yellow",
+  "Purple",
+  "Green",
 ];
 
 export const brands = [
-  'Nike', 'Adidas', 'Zara', 'H&M', 'Uniqlo', 'Forever 21', 'Gap', 'Levi\'s',
-  'Calvin Klein', 'Tommy Hilfiger', 'Ralph Lauren', 'Champion', 'Puma', 'Vans',
+  "Nike",
+  "Adidas",
+  "Zara",
+  "H&M",
+  "Uniqlo",
+  "Forever 21",
+  "Gap",
+  "Levi's",
+  "Calvin Klein",
+  "Tommy Hilfiger",
+  "Ralph Lauren",
+  "Champion",
+  "Puma",
+  "Vans",
 ];
 
-export const occasions = [
-  'Casual', 'Formal', 'Work', 'Party', 'Sports', 'Travel', 'Beach',
-];
+export const occasions = ["Casual", "Formal", "Work", "Party", "Sports", "Travel", "Beach"];
