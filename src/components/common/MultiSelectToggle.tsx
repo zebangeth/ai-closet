@@ -1,41 +1,40 @@
 import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet, ScrollView } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons"; // Ensure you're using Expo or have react-native-vector-icons installed
+import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 
 type Props = {
-  selectedSeasons: string[];
-  onValueChange: (seasons: string[]) => void;
+  options: string[];
+  selectedValues: string[];
+  onValueChange: (selected: string[]) => void;
 };
 
-const seasons = ["Spring/Fall", "Summer", "Winter"];
-
-const SeasonToggle = ({ selectedSeasons, onValueChange }: Props) => {
-  const toggleSeason = (season: string) => {
-    let updatedSeasons = [...selectedSeasons];
-    if (updatedSeasons.includes(season)) {
-      updatedSeasons = updatedSeasons.filter((s) => s !== season);
+const MultiSelectToggle = ({ options, selectedValues, onValueChange }: Props) => {
+  const toggleValue = (value: string) => {
+    let updatedValues = [...selectedValues];
+    if (updatedValues.includes(value)) {
+      updatedValues = updatedValues.filter((v) => v !== value);
     } else {
-      updatedSeasons.push(season);
+      updatedValues.push(value);
     }
-    onValueChange(updatedSeasons);
+    onValueChange(updatedValues);
   };
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      {seasons.map((season) => {
-        const isSelected = selectedSeasons.includes(season);
+      {options.map((option) => {
+        const isSelected = selectedValues.includes(option);
         return (
           <TouchableOpacity
-            key={season}
+            key={option}
             style={[styles.button, isSelected && styles.buttonSelected]}
-            onPress={() => toggleSeason(season)}
+            onPress={() => toggleValue(option)}
           >
             <View style={styles.buttonContent}>
               {isSelected && (
                 <MaterialIcons name="check" size={16} color={colors.tag_dark_text} style={styles.checkIcon} />
               )}
-              <Text style={[styles.buttonText, isSelected && styles.buttonTextSelected]}>{season}</Text>
+              <Text style={[styles.buttonText, isSelected && styles.buttonTextSelected]}>{option}</Text>
             </View>
           </TouchableOpacity>
         );
@@ -73,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SeasonToggle;
+export default MultiSelectToggle;

@@ -29,5 +29,3 @@ export const brands = [
   "Puma",
   "Vans",
 ];
-
-export const occasions = ["Casual", "Formal", "Work", "Party", "Sports", "Travel", "Beach"];

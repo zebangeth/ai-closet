@@ -1,5 +1,3 @@
-// screens/ClothingDetailScreen.tsx
-
 import React, { useContext, useState, useEffect } from "react";
 import {
   View,
@@ -20,13 +18,10 @@ import { colors } from "../styles/colors";
 import TagChips from "../components/common/TagChips";
 import Header from "../components/common/Header";
 import CategoryPicker from "../components/common/CategoryPicker";
-import SeasonToggle from "../components/common/SeasonToggle";
+import MultiSelectToggle from "../components/common/MultiSelectToggle";
 import YearMonthPicker from "../components/common/YearMonthPicker";
-import {
-  colors as colorSuggestions,
-  brands as brandSuggestions,
-  occasions as occasionSuggestions,
-} from "../data/suggestions";
+import { seasons, occasions } from "../data/options";
+import { colors as colorSuggestions, brands as brandSuggestions } from "../data/suggestions";
 import { typography } from "../styles/globalStyles";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -147,7 +142,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Item Details</Text>
-
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>Category</Text>
               <CategoryPicker
@@ -159,15 +153,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                 }}
               />
             </View>
-
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Season</Text>
-              <SeasonToggle
-                selectedSeasons={localItem.season}
-                onValueChange={(seasons) => handleFieldChange("season", seasons)}
-              />
-            </View>
-
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>Color</Text>
               <TextInput
@@ -177,7 +162,22 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                 onChangeText={(text) => handleFieldChange("color", text)}
               />
             </View>
-
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Season</Text>
+              <MultiSelectToggle
+                options={seasons}
+                selectedValues={localItem.season}
+                onValueChange={(selectedSeasons) => handleFieldChange("season", selectedSeasons)}
+              />
+            </View>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Occasion</Text>
+              <MultiSelectToggle
+                options={occasions}
+                selectedValues={localItem.occasion}
+                onValueChange={(selectedOccasions) => handleFieldChange("occasion", selectedOccasions)}
+              />
+            </View>
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>Occasion</Text>
               <TextInput
@@ -192,7 +192,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                 }
               />
             </View>
-
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>Brand</Text>
               <TextInput
@@ -202,7 +201,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                 onChangeText={(text) => handleFieldChange("brand", text)}
               />
             </View>
-
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>Purchase Date</Text>
               <YearMonthPicker
@@ -210,7 +208,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                 onValueChange={(date) => handleFieldChange("purchaseDate", date)}
               />
             </View>
-
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>Price</Text>
               <TextInput
