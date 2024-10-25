@@ -13,14 +13,12 @@ type CategoryKey = keyof typeof categories;
 
 const categoryIcons: { [key in CategoryKey]: React.ComponentProps<typeof MaterialCommunityIcons>["name"] } = {
   Tops: "tshirt-crew",
-  Pants: "roller-skate-off",
-  Skirts: "tshirt-crew",
+  Bottoms: "roller-skate-off",
   Dresses: "tshirt-crew",
-  Shoes: "shoe-formal",
+  Footwear: "shoe-formal",
   Bags: "bag-personal",
-  Hats: "hat-fedora",
+  Accessories: "hat-fedora",
   Jewelry: "diamond-stone",
-  Accessories: "sunglasses",
 };
 
 const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }: Props) => {
