@@ -20,6 +20,7 @@
     "expo": "~51.0.28",
     "expo-file-system": "~17.0.1",
     "expo-font": "~12.0.10",
+    "expo-image-manipulator": "^12.0.5",
     "expo-image-picker": "~15.0.7",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",

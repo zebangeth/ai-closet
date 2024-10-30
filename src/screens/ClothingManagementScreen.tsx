@@ -89,9 +89,13 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
     try {
       setIsProcessing(true);
 
+      // Step 1: Remove background
       const bgRemovedUri = await removeBackground(uri);
+
+      // Step 2: Categorize clothing (existing functionality)
       const aiData = await categorizeClothing(bgRemovedUri);
 
+      // Step 3: Create a new ClothingItem
       const newItem: ClothingItem = {
         id: uuidv4(),
         imageUri: uri,
@@ -109,7 +113,10 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
         price: 0,
       };
 
+      // Step 4: Add the new clothing item to context
       addClothingItem(newItem);
+
+      // Step 5: Navigate to the detail screen
       navigation.navigate("ClothingDetail", { id: newItem.id });
     } catch (error) {
       console.error("Error processing image:", error);
