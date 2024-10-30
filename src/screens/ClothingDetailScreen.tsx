@@ -122,6 +122,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
             source={{
               uri: localItem.backgroundRemovedImageUri || localItem.imageUri,
             }}
+            resizeMode="contain"
             style={styles.image}
           />
 
@@ -179,20 +180,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               />
             </View>
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Occasion</Text>
-              <TextInput
-                style={styles.textInput}
-                value={localItem.occasion.join(", ")}
-                placeholder="Enter occasion(s)"
-                onChangeText={(text) =>
-                  handleFieldChange(
-                    "occasion",
-                    text.split(",").map((s) => s.trim())
-                  )
-                }
-              />
-            </View>
-            <View style={styles.field}>
               <Text style={styles.fieldLabel}>Brand</Text>
               <TextInput
                 style={styles.textInput}
@@ -244,6 +231,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     aspectRatio: 1,
+    backgroundColor: "#F8F8F8",
   },
   section: {
     paddingVertical: 8,
@@ -283,12 +271,13 @@ const styles = StyleSheet.create({
     right: 20,
     backgroundColor: colors.primary_yellow,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: "center",
   },
   saveButtonText: {
     fontSize: 16,
-    color: "#fff",
+    fontFamily: typography.bold,
+    color: colors.text_primary,
   },
 });
 

@@ -92,7 +92,7 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
       // Step 1: Remove background
       const bgRemovedUri = await removeBackground(uri);
 
-      // Step 2: Categorize clothing (existing functionality)
+      // Step 2: Categorize clothing
       const aiData = await categorizeClothing(bgRemovedUri);
 
       // Step 3: Create a new ClothingItem
@@ -268,9 +268,9 @@ const styles = StyleSheet.create({
     color: colors.text_primary,
   },
   tagsContainer: {
-    maxHeight: 36,
+    maxHeight: 38,
     marginTop: 8,
-    paddingBottom: 6,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderColor: colors.divider_light,
   },
@@ -300,7 +300,8 @@ const styles = StyleSheet.create({
     color: colors.tag_dark_text,
   },
   gridContent: {
-    padding: 2,
+    paddingTop: 6,
+    paddingHorizontal: 10,
   },
   loadingOverlay: {
     position: "absolute",
