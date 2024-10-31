@@ -1,8 +1,6 @@
 import * as FileSystem from "expo-file-system";
-import * as ImageManipulator from "expo-image-manipulator";
 
-const API_KEY = process.env.EXPO_PUBLIC_FAL_KEY;
-
+const FAL_API_KEY = process.env.EXPO_PUBLIC_FAL_KEY;
 const API_ENDPOINT = "https://queue.fal.run/fal-ai/birefnet/v2";
 
 export const removeBackground = async (imageUri: string): Promise<string> => {
@@ -10,12 +8,12 @@ export const removeBackground = async (imageUri: string): Promise<string> => {
   try {
     // Read the image file and convert it to Base64
     const base64 = await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
-    const dataUri = `data:image/jpeg;base64,${base64}`;
+    const base64Uri = `data:image/jpeg;base64,${base64}`;
     console.debug("Image Read Time:", new Date().toISOString());
 
     // Prepare the payload
     const payload = {
-      image_url: dataUri,
+      image_url: base64Uri,
       model: "General Use (Light)",
       operating_resolution: "1024x1024",
       output_format: "png",
@@ -26,7 +24,7 @@ export const removeBackground = async (imageUri: string): Promise<string> => {
     const response = await fetch(API_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: `Key ${API_KEY}`,
+        Authorization: `Key ${FAL_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -56,7 +54,7 @@ export const removeBackground = async (imageUri: string): Promise<string> => {
       const statusResponse = await fetch(status_url, {
         method: "GET",
         headers: {
-          Authorization: `Key ${API_KEY}`,
+          Authorization: `Key ${FAL_API_KEY}`,
           "Content-Type": "application/json",
         },
       });
@@ -79,7 +77,7 @@ export const removeBackground = async (imageUri: string): Promise<string> => {
     const resultResponse = await fetch(response_url, {
       method: "GET",
       headers: {
-        Authorization: `Key ${API_KEY}`,
+        Authorization: `Key ${FAL_API_KEY}`,
         "Content-Type": "application/json",
       },
     });
