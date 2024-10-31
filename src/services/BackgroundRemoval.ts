@@ -4,12 +4,12 @@ const FAL_API_KEY = process.env.EXPO_PUBLIC_FAL_KEY;
 const API_ENDPOINT = "https://queue.fal.run/fal-ai/birefnet/v2";
 
 export const removeBackground = async (imageUri: string): Promise<string> => {
-  console.debug("Request Initiated Time:", new Date().toISOString());
+  console.debug("[BG Removal Service] Request Initiated Time:", new Date().toISOString());
   try {
     // Read the image file and convert it to Base64
     const base64 = await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
     const base64Uri = `data:image/jpeg;base64,${base64}`;
-    console.debug("Image Read Time:", new Date().toISOString());
+    console.debug("[BG Removal Service] Image Read Time:", new Date().toISOString());
 
     // Prepare the payload
     const payload = {
@@ -30,8 +30,7 @@ export const removeBackground = async (imageUri: string): Promise<string> => {
       body: JSON.stringify(payload),
     });
 
-    console.debug("Response:", response);
-    console.debug("Request Submitted Time:", new Date().toISOString());
+    console.debug("[BG Removal Service] Request Submitted Time:", new Date().toISOString());
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -89,8 +88,7 @@ export const removeBackground = async (imageUri: string): Promise<string> => {
     }
 
     const resultData = await resultResponse.json();
-    console.debug("Result:", resultData);
-    console.debug("Process Complete Time:", new Date().toISOString());
+    console.debug("[BG Removal Service] Process Complete Time:", new Date().toISOString());
     const imageUrl = resultData.image.url;
 
     if (!imageUrl) {
@@ -102,7 +100,7 @@ export const removeBackground = async (imageUri: string): Promise<string> => {
     const downloadResumable = FileSystem.createDownloadResumable(imageUrl, fileUri);
 
     const downloadResult = await downloadResumable.downloadAsync();
-    console.debug("Download Complete Time:", new Date().toISOString());
+    console.debug("[BG Removal Service] Download Complete Time:", new Date().toISOString());
 
     if (downloadResult && downloadResult.status === 200) {
       return downloadResult.uri;

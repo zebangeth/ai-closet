@@ -7,6 +7,7 @@ const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_KEY;
 
 export const categorizeClothing = async (imageUri: string): Promise<Partial<ClothingItem>> => {
   try {
+    console.debug("[Categorization Service] Request Initiated Time:", new Date().toISOString());
     // Read the image file and convert it to Base64
     const base64 = await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
     const base64Uri = `data:image/jpeg;base64,${base64}`;
@@ -51,6 +52,7 @@ export const categorizeClothing = async (imageUri: string): Promise<Partial<Clot
               type: "image_url",
               image_url: {
                 url: base64Uri,
+                detail: "low",
               },
             },
           ],
@@ -77,6 +79,8 @@ export const categorizeClothing = async (imageUri: string): Promise<Partial<Clot
       },
     };
 
+    // Submit the request
+    console.debug("[Categorization Service] Request Submitted Time:", new Date().toISOString());
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -94,6 +98,7 @@ export const categorizeClothing = async (imageUri: string): Promise<Partial<Clot
     const responseData = await response.json();
 
     // Extract the AI's response
+    console.debug("[Categorization Service] Response Received Time:", new Date().toISOString());
     const aiContent = responseData.choices[0].message.content;
     const parsedData = JSON.parse(aiContent);
 
