@@ -4,8 +4,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ClothingManagementScreen from "../screens/ClothingManagementScreen";
 import ClothingDetailScreen from "../screens/ClothingDetailScreen";
+import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
 import { ClosetStackParamList } from "../types/navigation";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons, SimpleLineIcons, FontAwesome6 } from "@expo/vector-icons";
 import { Platform, StyleSheet } from "react-native";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -14,7 +15,6 @@ const Tab = createBottomTabNavigator();
 const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
 
 const OutfitManagementScreen = () => <></>;
-const VirtualTryOnScreen = () => <></>;
 const ProfileScreen = () => <></>;
 
 // Define the Stack Navigator for the Closet tab
@@ -56,7 +56,7 @@ const AppNavigator = () => {
           name="Try-On"
           component={VirtualTryOnScreen}
           options={{
-            tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="wizard-hat" size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => <FontAwesome6 name="wand-magic-sparkles" size={20} color={color} />,
           }}
         />
         <Tab.Screen
