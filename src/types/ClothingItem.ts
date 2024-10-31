@@ -7,7 +7,7 @@ export interface ClothingItem {
   category: string;
   subcategory: string;
   tags: string[]; // custom tags, e.g. 'summer favorite', 'work outfit'
-  color: string;
+  color: string[];
   season: string[];
   occasion: string[];
   brand: string;

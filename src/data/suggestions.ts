@@ -1,18 +1,3 @@
-export const colors = [
-  "Black",
-  "White",
-  "Gray",
-  "Blue",
-  "Pink",
-  "Beige",
-  "Brown",
-  "Orange",
-  "Red",
-  "Yellow",
-  "Purple",
-  "Green",
-];
-
 export const brands = [
   "Nike",
   "Adidas",
