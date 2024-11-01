@@ -1,17 +1,59 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Alert, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import TryOnOptionSheet from "../components/virtualTryOn/TryOnOptionSheet";
+import ContentSelectionBox from "../components/virtualTryOn/ContentSelectionBox";
+import PhotoTipsSection from "../components/virtualTryOn/PhotoTipsSection";
 
 const VirtualTryOnScreen = () => {
   const [isOptionSheetVisible, setOptionSheetVisible] = useState(false);
+  const [selectedOutfitUri, setSelectedOutfitUri] = useState<string>();
+  const [selectedPhotoUri, setSelectedPhotoUri] = useState<string>();
 
-  const handleOptionSelect = (optionId: string) => {
+  const handleOptionSelect = async (optionId: string) => {
     setOptionSheetVisible(false);
-    // Handle option selection in the next step
+
+    if (optionId === "discover") {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert("Permission Required", "Permission to access gallery is required!");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [3, 4],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setSelectedOutfitUri(result.assets[0].uri);
+      }
+    }
+    // Handle other options in the next implementation steps
+  };
+
+  const handlePhotoSelect = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission Required", "Permission to access gallery is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedPhotoUri(result.assets[0].uri);
+    }
   };
 
   return (
@@ -26,12 +68,25 @@ const VirtualTryOnScreen = () => {
         <Text style={styles.instructions}>Select an outfit and upload your photo to see how it looks on you</Text>
 
         {/* Photo Tips Section */}
-        <View style={styles.tipsSection}>
-          <MaterialIcons name="info" size={20} color={colors.text_gray} />
-          <Text style={styles.tipsText}>Show Photo Tips</Text>
+        <PhotoTipsSection />
+
+        {/* Content Selection Area */}
+        <View style={styles.selectionContainer}>
+          <ContentSelectionBox
+            title="Choose Outfit"
+            iconName="checkroom"
+            onPress={() => setOptionSheetVisible(true)}
+            selectedImageUri={selectedOutfitUri}
+          />
+          <ContentSelectionBox
+            title="Add Your Picture"
+            iconName="add-a-photo"
+            onPress={handlePhotoSelect}
+            selectedImageUri={selectedPhotoUri}
+          />
         </View>
 
-        {/* Main content areas will be added in next step */}
+        {/* Try It On button will be added in the next step */}
       </ScrollView>
 
       <TryOnOptionSheet
@@ -68,17 +123,10 @@ const styles = StyleSheet.create({
     color: colors.text_gray,
     marginBottom: 16,
   },
-  tipsSection: {
+  selectionContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+    marginHorizontal: -6,
     marginBottom: 24,
-  },
-  tipsText: {
-    fontSize: 14,
-    fontFamily: typography.medium,
-    color: colors.text_gray,
-    textDecorationLine: "underline",
   },
 });
 

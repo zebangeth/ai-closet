@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 4,
     padding: 8,
+    fontSize: 16,
   },
   fieldInput: {
     borderWidth: 1,
