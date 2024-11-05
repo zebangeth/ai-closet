@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, Alert, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { colors } from "../styles/colors";
@@ -7,11 +7,38 @@ import { typography } from "../styles/globalStyles";
 import TryOnOptionSheet from "../components/virtualTryOn/TryOnOptionSheet";
 import ContentSelectionBox from "../components/virtualTryOn/ContentSelectionBox";
 import PhotoTipsSection from "../components/virtualTryOn/PhotoTipsSection";
+import TryOnProgress from "../components/virtualTryOn/TryOnProgress";
+import { virtualTryOn } from "../services/VirtualTryOn";
 
 const VirtualTryOnScreen = () => {
   const [isOptionSheetVisible, setOptionSheetVisible] = useState(false);
   const [selectedOutfitUri, setSelectedOutfitUri] = useState<string>();
   const [selectedPhotoUri, setSelectedPhotoUri] = useState<string>();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [resultImageUri, setResultImageUri] = useState<string>();
+
+  // Progress timer effect
+  useEffect(() => {
+    if (isProcessing) {
+      const startTime = Date.now();
+      const targetTime = startTime + 30000; // 30 seconds
+
+      const intervalId = setInterval(() => {
+        const currentTime = Date.now();
+        const elapsed = currentTime - startTime;
+        const percentage = Math.min((elapsed / 30000) * 95, 95); // Max 95% until API returns
+
+        if (currentTime >= targetTime) {
+          clearInterval(intervalId);
+        } else {
+          setProgress(percentage);
+        }
+      }, 100); // Update every 100ms for smooth animation
+
+      return () => clearInterval(intervalId);
+    }
+  }, [isProcessing]);
 
   const handleOptionSelect = async (optionId: string) => {
     setOptionSheetVisible(false);
@@ -32,9 +59,9 @@ const VirtualTryOnScreen = () => {
 
       if (!result.canceled) {
         setSelectedOutfitUri(result.assets[0].uri);
+        setResultImageUri(undefined); // Clear previous result when new outfit is selected
       }
     }
-    // Handle other options in the next implementation steps
   };
 
   const handlePhotoSelect = async () => {
@@ -53,8 +80,35 @@ const VirtualTryOnScreen = () => {
 
     if (!result.canceled) {
       setSelectedPhotoUri(result.assets[0].uri);
+      setResultImageUri(undefined); // Clear previous result when new photo is selected
     }
   };
+
+  // Handle try-on process
+  const handleTryOn = useCallback(async () => {
+    if (!selectedOutfitUri || !selectedPhotoUri) {
+      Alert.alert("Missing Content", "Please select both an outfit and a photo to continue.");
+      return;
+    }
+
+    setIsProcessing(true);
+    setProgress(0);
+
+    try {
+      const response = await virtualTryOn({
+        outfitImageUri: selectedOutfitUri,
+        userPhotoUri: selectedPhotoUri,
+      });
+
+      setResultImageUri(response.resultImageUri);
+      setProgress(100);
+    } catch (error) {
+      Alert.alert("Error", "Failed to process virtual try-on. Please try again.");
+      console.error("Virtual try-on error:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [selectedOutfitUri, selectedPhotoUri]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,7 +140,36 @@ const VirtualTryOnScreen = () => {
           />
         </View>
 
-        {/* Try It On button will be added in the next step */}
+        {/* Try-On Progress or Button */}
+        {isProcessing ? (
+          <TryOnProgress progress={progress} />
+        ) : (
+          !resultImageUri && (
+            <TouchableOpacity
+              style={[styles.tryOnButton, (!selectedOutfitUri || !selectedPhotoUri) && styles.tryOnButtonDisabled]}
+              onPress={handleTryOn}
+              disabled={!selectedOutfitUri || !selectedPhotoUri}
+            >
+              <Text style={styles.tryOnButtonText}>Try It On!</Text>
+            </TouchableOpacity>
+          )
+        )}
+
+        {/* Result Display */}
+        {resultImageUri && (
+          <View style={styles.resultContainer}>
+            <Image source={{ uri: resultImageUri }} style={styles.resultImage} resizeMode="contain" />
+            <TouchableOpacity
+              style={styles.regenerateButton}
+              onPress={() => {
+                setResultImageUri(undefined);
+                handleTryOn();
+              }}
+            >
+              <Text style={styles.regenerateButtonText}>Re-generate</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
 
       <TryOnOptionSheet
@@ -127,6 +210,42 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginHorizontal: -6,
     marginBottom: 24,
+  },
+  tryOnButton: {
+    backgroundColor: colors.primary_yellow,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  tryOnButtonDisabled: {
+    opacity: 0.5,
+  },
+  tryOnButtonText: {
+    fontSize: 16,
+    fontFamily: typography.bold,
+    color: colors.text_primary,
+  },
+  resultContainer: {
+    marginBottom: 24,
+  },
+  resultImage: {
+    width: "100%",
+    aspectRatio: 3 / 4,
+    borderRadius: 12,
+    marginBottom: 12,
+    backgroundColor: colors.thumbnail_background,
+  },
+  regenerateButton: {
+    backgroundColor: colors.thumbnail_background,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  regenerateButtonText: {
+    fontSize: 14,
+    fontFamily: typography.medium,
+    color: colors.text_primary,
   },
 });
 
