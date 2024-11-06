@@ -8,6 +8,7 @@ import {
 } from "@expo-google-fonts/plus-jakarta-sans";
 import AppNavigator from "./src/navigation";
 import { ClothingProvider } from "./src/contexts/ClothingContext";
+import { VirtualTryOnProvider } from "./src/contexts/VirtualTryOnContext";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -23,7 +24,9 @@ export default function App() {
 
   return (
     <ClothingProvider>
-      <AppNavigator />
+      <VirtualTryOnProvider>
+        <AppNavigator />
+      </VirtualTryOnProvider>
     </ClothingProvider>
   );
 }
