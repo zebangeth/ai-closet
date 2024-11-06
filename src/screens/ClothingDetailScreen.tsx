@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
+import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { ClothingContext } from "../contexts/ClothingContext";
 import { ClothingDetailScreenProps as Props } from "../types/navigation";
 import { ClothingItem } from "../types/ClothingItem";
@@ -23,7 +24,6 @@ import YearMonthPicker from "../components/common/YearMonthPicker";
 import { colors as colorOptions, seasons, occasions } from "../data/options";
 import { brands as brandSuggestions } from "../data/suggestions";
 import { typography } from "../styles/globalStyles";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const { id } = route.params;
@@ -86,6 +86,8 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
     });
     setIsDirty(true);
   };
+
+  const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
   return (
     <SafeAreaView style={styles.container}>

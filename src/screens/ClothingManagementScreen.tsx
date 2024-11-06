@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, FlatList, ScrollView, Pressable, Alert, ActivityIndicator } from "react-native";
+import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { v4 as uuidv4 } from "uuid";
@@ -14,7 +15,6 @@ import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import { removeBackground } from "../services/BackgroundRemoval";
 import { categorizeClothing } from "../services/ClothingCategorization";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 type Props = NativeStackScreenProps<ClosetStackParamList, "ClothingManagement">;
 
@@ -123,8 +123,10 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
     }
   };
 
+  const safeAreaEdges: Edge[] = ["top", "left", "right"];
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>My Closet</Text>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -52,7 +52,7 @@ const VirtualTryOnScreen = () => {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [3, 4],
         quality: 1,
       });
@@ -73,7 +73,7 @@ const VirtualTryOnScreen = () => {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: false,
       aspect: [3, 4],
       quality: 1,
     });
@@ -110,8 +110,10 @@ const VirtualTryOnScreen = () => {
     }
   }, [selectedOutfitUri, selectedPhotoUri]);
 
+  const safeAreaEdges: Edge[] = ["top", "left", "right"];
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Virtual Try-On</Text>
