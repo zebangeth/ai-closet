@@ -22,7 +22,7 @@ const ContentSelectionBox = ({ title, iconName, onPress, selectedImageUri }: Pro
           <View style={styles.iconCircle}>
             <MaterialIcons name={iconName} size={32} color={colors.text_gray} />
           </View>
-          <Text style={styles.addButtonText}>Select {title}</Text>
+          <Text style={styles.addButtonText}>{title}</Text>
         </>
       )}
     </TouchableOpacity>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   selectionArea: {
-    aspectRatio: 1,
+    aspectRatio: 3 / 4,
     backgroundColor: colors.thumbnail_background,
     borderRadius: 12,
     justifyContent: "center",
