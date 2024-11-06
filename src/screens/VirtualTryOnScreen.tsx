@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
@@ -8,7 +8,10 @@ import TryOnOptionSheet from "../components/virtualTryOn/TryOnOptionSheet";
 import ContentSelectionBox from "../components/virtualTryOn/ContentSelectionBox";
 import PhotoTipsSection from "../components/virtualTryOn/PhotoTipsSection";
 import TryOnProgress from "../components/virtualTryOn/TryOnProgress";
+import RecentlyTriedSection from "../components/virtualTryOn/RecentlyTriedSection";
 import { virtualTryOn } from "../services/VirtualTryOn";
+import { VirtualTryOnContext } from "../contexts/VirtualTryOnContext";
+import { VirtualTryOnItem } from "../types/VirtualTryOn";
 
 const VirtualTryOnScreen = () => {
   const [isOptionSheetVisible, setOptionSheetVisible] = useState(false);
@@ -17,6 +20,12 @@ const VirtualTryOnScreen = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [resultImageUri, setResultImageUri] = useState<string>();
+
+  const tryOnContext = useContext(VirtualTryOnContext);
+  if (!tryOnContext) {
+    return null;
+  }
+  const { recentTryOns, addTryOn } = tryOnContext;
 
   // Progress timer effect
   useEffect(() => {
@@ -102,13 +111,27 @@ const VirtualTryOnScreen = () => {
 
       setResultImageUri(response.resultImageUri);
       setProgress(100);
+
+      // Save to try-on history
+      await addTryOn({
+        tryOnType: "discover", // Since we're currently only supporting the discover option
+        newClothingImageUri: selectedOutfitUri,
+        userPhotoUri: selectedPhotoUri,
+        resultImageUri: response.resultImageUri,
+      });
     } catch (error) {
       Alert.alert("Error", "Failed to process virtual try-on. Please try again.");
       console.error("Virtual try-on error:", error);
     } finally {
       setIsProcessing(false);
     }
-  }, [selectedOutfitUri, selectedPhotoUri]);
+  }, [selectedOutfitUri, selectedPhotoUri, addTryOn]);
+
+  const handleRecentItemPress = (item: VirtualTryOnItem) => {
+    setSelectedOutfitUri(item.newClothingImageUri);
+    setSelectedPhotoUri(item.userPhotoUri);
+    setResultImageUri(item.resultImageUri);
+  };
 
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
@@ -160,6 +183,7 @@ const VirtualTryOnScreen = () => {
         {/* Result Display */}
         {resultImageUri && (
           <View style={styles.resultContainer}>
+            <Text style={styles.subtitle}>Here's how it looks on you!</Text>
             <Image source={{ uri: resultImageUri }} style={styles.resultImage} resizeMode="contain" />
             <TouchableOpacity
               style={styles.regenerateButton}
@@ -172,6 +196,9 @@ const VirtualTryOnScreen = () => {
             </TouchableOpacity>
           </View>
         )}
+
+        {/* Recently Tried Section */}
+        {recentTryOns.length > 0 && <RecentlyTriedSection items={recentTryOns} onItemPress={handleRecentItemPress} />}
       </ScrollView>
 
       <TryOnOptionSheet
@@ -230,6 +257,12 @@ const styles = StyleSheet.create({
   },
   resultContainer: {
     marginBottom: 24,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontFamily: typography.medium,
+    color: colors.text_primary,
+    marginBottom: 12,
   },
   resultImage: {
     width: "100%",
