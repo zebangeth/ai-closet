@@ -1,8 +1,8 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
+import ViewShot, { CaptureOptions } from "react-native-view-shot";
 import { OutfitStackScreenProps } from "../types/navigation";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -14,15 +14,28 @@ import { ClothingItem } from "../types/ClothingItem";
 import { Outfit, OutfitItem } from "../types/Outfit";
 import { v4 as uuidv4 } from "uuid";
 
-const ITEM_SIZE = 150; // Default item size
+const ITEM_SIZE = 150;
 
 type Props = OutfitStackScreenProps<"OutfitCanvas">;
+
+type ViewShotRef = {
+  capture: (options?: CaptureOptions) => Promise<string>;
+} & ViewShot;
+
+type CanvasRef = {
+  deselectAll: () => void;
+};
 
 const OutfitCanvasScreen = ({ navigation, route }: Props) => {
   const isEditing = !!route.params?.id;
   const [isAddItemsVisible, setIsAddItemsVisible] = useState(false);
   const [canvasItems, setCanvasItems] = useState<OutfitItem[]>([]);
   const [canvasLayout, setCanvasLayout] = useState({ width: 0, height: 0 });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const viewShotRef = useRef<ViewShotRef>(null);
+  const canvasRef = useRef<CanvasRef>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const clothingContext = useContext(ClothingContext);
   const outfitContext = useContext(OutfitContext);
@@ -51,12 +64,12 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     const newItem: OutfitItem = {
       id: item.id,
       transform: {
-        x: canvasLayout.width / 2 - ITEM_SIZE / 2, // Center X
-        y: canvasLayout.height / 2 - ITEM_SIZE / 2, // Center Y
+        x: canvasLayout.width / 2 - ITEM_SIZE / 2,
+        y: canvasLayout.height / 2 - ITEM_SIZE / 2,
         scale: 1,
         rotation: 0,
       },
-      zIndex: canvasItems.length + 1, // New items appear on top
+      zIndex: canvasItems.length + 1,
     };
     setCanvasItems((prev) => [...prev, newItem]);
   };
@@ -90,6 +103,36 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     ]);
   };
 
+  const captureCanvas = async (): Promise<string> => {
+    if (!viewShotRef.current) {
+      throw new Error("Canvas reference not found");
+    }
+
+    try {
+      // Set capturing state to true to remove background
+      setIsCapturing(true);
+      // Deselect all items before capture
+      canvasRef.current?.deselectAll();
+
+      // Wait a frame to ensure background is removed
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const uri = await viewShotRef.current.capture({
+        format: "png",
+        quality: 1,
+        result: "base64",
+      });
+
+      return uri;
+    } catch (error) {
+      console.error("Error capturing canvas:", error);
+      throw error;
+    } finally {
+      // Reset capturing state
+      setIsCapturing(false);
+    }
+  };
+
   const handleSave = async () => {
     if (canvasItems.length === 0) {
       Alert.alert("Error", "Please add at least one item to the outfit");
@@ -97,8 +140,8 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     }
 
     try {
-      // TODO: Generate outfit preview image
-      const outfitImageUri = ""; // This should be implemented
+      setIsSaving(true);
+      const outfitImageUri = await captureCanvas();
 
       const outfit: Outfit = {
         id: isEditing ? route.params!.id! : uuidv4(),
@@ -121,6 +164,8 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     } catch (error) {
       console.error("Error saving outfit:", error);
       Alert.alert("Error", "Failed to save outfit");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -132,28 +177,48 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
           <MaterialIcons name="arrow-back" size={24} color={colors.icon_stroke} />
         </TouchableOpacity>
         <Text style={styles.title}>Outfit Canvas</Text>
-        <TouchableOpacity onPress={handleSave} style={styles.headerButton}>
-          <MaterialIcons name="save" size={24} color={colors.icon_stroke} />
+        <TouchableOpacity onPress={handleSave} disabled={isSaving} style={styles.headerButton}>
+          <MaterialIcons name="save" size={24} color={isSaving ? colors.text_gray : colors.icon_stroke} />
         </TouchableOpacity>
       </View>
 
       {/* Canvas Area */}
-      <GestureHandlerRootView style={styles.canvasArea}>
-        <OutfitCanvas
-          items={canvasItems}
-          clothingItems={clothingItemsMap}
-          onUpdateItem={handleUpdateItem}
-          onDeleteItem={handleDeleteItem}
-          onUpdateZIndex={handleUpdateZIndex}
-        />
-      </GestureHandlerRootView>
+      <ViewShot
+        ref={viewShotRef}
+        style={styles.canvasArea}
+        options={{
+          format: "png",
+          quality: 1,
+        }}
+      >
+        <View
+          style={[styles.canvasWrapper, { backgroundColor: isCapturing ? "transparent" : colors.thumbnail_background }]}
+        >
+          <OutfitCanvas
+            ref={canvasRef}
+            items={canvasItems}
+            clothingItems={clothingItemsMap}
+            onUpdateItem={handleUpdateItem}
+            onDeleteItem={handleDeleteItem}
+            onUpdateZIndex={handleUpdateZIndex}
+          />
+        </View>
+      </ViewShot>
 
       {/* Bottom Buttons */}
       <View style={styles.bottomButtons}>
-        <TouchableOpacity style={styles.button} onPress={() => setIsAddItemsVisible(true)}>
+        <TouchableOpacity
+          style={[styles.button, isSaving && styles.buttonDisabled]}
+          onPress={() => setIsAddItemsVisible(true)}
+          disabled={isSaving}
+        >
           <Text style={styles.buttonText}>Add Items</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
+        <TouchableOpacity
+          style={[styles.button, isSaving && styles.buttonDisabled]}
+          onPress={handleSave}
+          disabled={isSaving}
+        >
           <Text style={styles.buttonText}>Save Outfit</Text>
         </TouchableOpacity>
       </View>
@@ -193,6 +258,11 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 16,
   },
+  canvasWrapper: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
   bottomButtons: {
     flexDirection: "row",
     padding: 16,
@@ -204,6 +274,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   buttonText: {
     fontSize: 16,
