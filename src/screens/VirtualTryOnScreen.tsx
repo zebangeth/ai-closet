@@ -12,8 +12,11 @@ import RecentlyTriedSection from "../components/virtualTryOn/RecentlyTriedSectio
 import { virtualTryOn } from "../services/VirtualTryOn";
 import { VirtualTryOnContext } from "../contexts/VirtualTryOnContext";
 import { VirtualTryOnItem } from "../types/VirtualTryOn";
+import { RootTabScreenProps } from "../types/navigation";
 
-const VirtualTryOnScreen = () => {
+type Props = RootTabScreenProps<"Try-On">;
+
+const VirtualTryOnScreen = ({ navigation }: Props) => {
   const [isOptionSheetVisible, setOptionSheetVisible] = useState(false);
   const [selectedOutfitUri, setSelectedOutfitUri] = useState<string>();
   const [selectedPhotoUri, setSelectedPhotoUri] = useState<string>();

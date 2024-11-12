@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { ClothingContext } from "../contexts/ClothingContext";
-import { ClothingDetailScreenProps as Props } from "../types/navigation";
+import { ClosetStackScreenProps } from "../types/navigation";
 import { ClothingItem } from "../types/ClothingItem";
 import { colors } from "../styles/colors";
 import TagChips from "../components/common/TagChips";
@@ -24,6 +24,8 @@ import YearMonthPicker from "../components/common/YearMonthPicker";
 import { colors as colorOptions, seasons, occasions } from "../data/options";
 import { brands as brandSuggestions } from "../data/suggestions";
 import { typography } from "../styles/globalStyles";
+
+type Props = ClosetStackScreenProps<"ClothingDetail">;
 
 const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const { id } = route.params;

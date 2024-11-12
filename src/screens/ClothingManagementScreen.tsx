@@ -6,8 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import { v4 as uuidv4 } from "uuid";
 import { ClothingContext } from "../contexts/ClothingContext";
 import { ClothingItem } from "../types/ClothingItem";
-import { ClosetStackParamList } from "../types/navigation";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { ClosetStackScreenProps } from "../types/navigation";
 import ClothingItemThumbnail from "../components/clothing/ClothingItemThumbnail";
 import AnimatedAddButton from "../components/common/AnimatedAddButton";
 import { categories } from "../data/categories";
@@ -16,7 +15,7 @@ import { typography } from "../styles/globalStyles";
 import { removeBackground } from "../services/BackgroundRemoval";
 import { categorizeClothing } from "../services/ClothingCategorization";
 
-type Props = NativeStackScreenProps<ClosetStackParamList, "ClothingManagement">;
+type Props = ClosetStackScreenProps<"ClothingManagement">;
 
 interface CategoryTabProps {
   name: string;

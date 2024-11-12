@@ -2,29 +2,43 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Platform, StyleSheet } from "react-native";
+import { MaterialIcons, MaterialCommunityIcons, FontAwesome6 } from "@expo/vector-icons";
+
+// Screens
 import ClothingManagementScreen from "../screens/ClothingManagementScreen";
 import ClothingDetailScreen from "../screens/ClothingDetailScreen";
+import OutfitManagementScreen from "../screens/OutfitManagementScreen";
+import OutfitCanvasScreen from "../screens/OutfitCanvasScreen";
+import OutfitDetailScreen from "../screens/OutfitDetailScreen";
 import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
-import { ClosetStackParamList } from "../types/navigation";
-import { MaterialIcons, MaterialCommunityIcons, SimpleLineIcons, FontAwesome6 } from "@expo/vector-icons";
-import { Platform, StyleSheet } from "react-native";
+import { RootTabParamList, ClosetStackParamList, OutfitStackParamList } from "../types/navigation";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootTabParamList>();
 const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
+const OutfitStack = createNativeStackNavigator<OutfitStackParamList>();
 
-const OutfitManagementScreen = () => <></>;
 const ProfileScreen = () => <></>;
 
-// Define the Stack Navigator for the Closet tab
-const ClosetStackScreen = () => (
+// Stack Navigators
+const ClosetStackNavigator = () => (
   <ClosetStack.Navigator screenOptions={{ headerShown: false }}>
     <ClosetStack.Screen name="ClothingManagement" component={ClothingManagementScreen} />
     <ClosetStack.Screen name="ClothingDetail" component={ClothingDetailScreen} />
   </ClosetStack.Navigator>
 );
 
+const OutfitStackNavigator = () => (
+  <OutfitStack.Navigator screenOptions={{ headerShown: false }}>
+    <OutfitStack.Screen name="OutfitManagement" component={OutfitManagementScreen} />
+    <OutfitStack.Screen name="OutfitCanvas" component={OutfitCanvasScreen} />
+    <OutfitStack.Screen name="OutfitDetail" component={OutfitDetailScreen} />
+  </OutfitStack.Navigator>
+);
+
+// Main Navigation Container
 const AppNavigator = () => {
   return (
     <NavigationContainer>
@@ -32,22 +46,22 @@ const AppNavigator = () => {
         screenOptions={{
           headerShown: false,
           tabBarStyle: styles.tabBar,
-          tabBarActiveTintColor: "#1C170D",
-          tabBarInactiveTintColor: "#9C854A",
+          tabBarActiveTintColor: colors.text_primary,
+          tabBarInactiveTintColor: colors.text_gray,
           tabBarLabelStyle: styles.tabBarLabel,
           tabBarIconStyle: styles.tabBarIcon,
         }}
       >
         <Tab.Screen
           name="Closet"
-          component={ClosetStackScreen}
+          component={ClosetStackNavigator}
           options={{
             tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="wardrobe" size={size} color={color} />,
           }}
         />
         <Tab.Screen
           name="Outfits"
-          component={OutfitManagementScreen}
+          component={OutfitStackNavigator}
           options={{
             tabBarIcon: ({ color, size }) => <MaterialIcons name="style" size={size} color={color} />,
           }}
@@ -79,7 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.screen_background,
     borderTopColor: colors.divider_light,
     borderTopWidth: 1,
-    elevation: 0, // Remove shadow on Android
+    elevation: 0,
   },
   tabBarLabel: {
     fontFamily: typography.medium,
