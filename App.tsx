@@ -9,6 +9,7 @@ import {
 import AppNavigator from "./src/navigation";
 import { ClothingProvider } from "./src/contexts/ClothingContext";
 import { VirtualTryOnProvider } from "./src/contexts/VirtualTryOnContext";
+import { OutfitProvider } from "./src/contexts/OutfitContext";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,9 +25,11 @@ export default function App() {
 
   return (
     <ClothingProvider>
-      <VirtualTryOnProvider>
-        <AppNavigator />
-      </VirtualTryOnProvider>
+      <OutfitProvider>
+        <VirtualTryOnProvider>
+          <AppNavigator />
+        </VirtualTryOnProvider>
+      </OutfitProvider>
     </ClothingProvider>
   );
 }
