@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, FlatList, Pressable, Dimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { OutfitContext } from "../contexts/OutfitContext";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -28,8 +28,10 @@ const OutfitManagementScreen = ({ navigation }: Props) => {
 
   const { tagData, filteredOutfits, activeFilters, setFilter } = context;
 
+  const safeAreaEdges: Edge[] = ["top", "left", "right"];
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>My Outfits</Text>

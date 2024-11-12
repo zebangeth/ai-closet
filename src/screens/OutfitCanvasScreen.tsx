@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import ViewShot, { CaptureOptions } from "react-native-view-shot";
 import { OutfitStackScreenProps } from "../types/navigation";
@@ -160,8 +160,14 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     }
   };
 
+  const safeAreaEdges: Edge[] = ["top", "left", "right"];
+
   return (
-    <SafeAreaView style={styles.container} onLayout={(e) => setCanvasLayout(e.nativeEvent.layout)}>
+    <SafeAreaView
+      style={styles.container}
+      edges={safeAreaEdges}
+      onLayout={(e) => setCanvasLayout(e.nativeEvent.layout)}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>

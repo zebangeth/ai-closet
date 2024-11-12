@@ -92,7 +92,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       <Header
         onBack={() => {
           if (isDirty) {
