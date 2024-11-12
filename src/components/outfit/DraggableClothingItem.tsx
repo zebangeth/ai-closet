@@ -15,6 +15,7 @@ type Props = {
   onDelete: () => void;
   isSelected: boolean;
   onSelect: () => void;
+  style?: any; // For zIndex
 };
 
 const CONTROL_BUTTON_SIZE = 24;
@@ -22,7 +23,16 @@ const MIN_SCALE = 0.2;
 const MAX_SCALE = 3;
 const ITEM_SIZE = 150; // Default item size
 
-const DraggableClothingItem = ({ item, transform, canvasLayout, onUpdate, onDelete, isSelected, onSelect }: Props) => {
+const DraggableClothingItem = ({
+  item,
+  transform,
+  canvasLayout,
+  onUpdate,
+  onDelete,
+  isSelected,
+  onSelect,
+  style,
+}: Props) => {
   // Shared values for animations
   const translateX = useSharedValue(transform.x);
   const translateY = useSharedValue(transform.y);
@@ -50,26 +60,42 @@ const DraggableClothingItem = ({ item, transform, canvasLayout, onUpdate, onDele
   // Drag gesture for moving the item
   const dragGesture = Gesture.Pan()
     .minPointers(1)
-    .maxPointers(1) // Ensure only single finger drag
+    .maxPointers(1)
     .onStart(() => {
       savedValues.value = {
         ...savedValues.value,
         translationX: translateX.value,
         translationY: translateY.value,
       };
+      runOnJS(onSelect)(); // Select the item when starting to drag
     })
     .onUpdate((e) => {
-      translateX.value = savedValues.value.translationX + e.translationX;
-      translateY.value = savedValues.value.translationY + e.translationY;
+      // Calculate new position
+      const newX = savedValues.value.translationX + e.translationX;
+      const newY = savedValues.value.translationY + e.translationY;
+
+      // Calculate bounds for the center of the item
+      const scaledSize = ITEM_SIZE * scale.value;
+      const halfItemSize = scaledSize / 2;
+      const minX = -halfItemSize;
+      const maxX = canvasLayout.width - halfItemSize;
+      const minY = -halfItemSize;
+      const maxY = canvasLayout.height - halfItemSize;
+
+      // Apply bounds constraints
+      translateX.value = Math.max(minX, Math.min(maxX, newX));
+      translateY.value = Math.max(minY, Math.min(maxY, newY));
     })
     .onEnd(() => {
       runOnJS(updateTransform)();
     });
 
   // Simple tap for selection
-  const tapGesture = Gesture.Tap().onStart(() => {
-    runOnJS(onSelect)();
-  });
+  const tapGesture = Gesture.Tap()
+    .onStart(() => {
+      runOnJS(onSelect)();
+    })
+    .maxDuration(250);
 
   // Pinch gesture for scaling
   const pinchGesture = Gesture.Pinch()
@@ -83,6 +109,18 @@ const DraggableClothingItem = ({ item, transform, canvasLayout, onUpdate, onDele
       const newScale = savedValues.value.scale * e.scale;
       if (newScale >= MIN_SCALE && newScale <= MAX_SCALE) {
         scale.value = newScale;
+
+        // Recalculate position bounds after scaling
+        const scaledSize = ITEM_SIZE * newScale;
+        const halfItemSize = scaledSize / 2;
+        const minX = -halfItemSize;
+        const maxX = canvasLayout.width - halfItemSize;
+        const minY = -halfItemSize;
+        const maxY = canvasLayout.height - halfItemSize;
+
+        // Keep item within bounds after scaling
+        translateX.value = Math.max(minX, Math.min(maxX, translateX.value));
+        translateY.value = Math.max(minY, Math.min(maxY, translateY.value));
       }
     })
     .onEnd(() => {
@@ -104,16 +142,9 @@ const DraggableClothingItem = ({ item, transform, canvasLayout, onUpdate, onDele
       runOnJS(updateTransform)();
     });
 
-  // Compose gestures:
-  // 1. Combine pinch and rotation to work simultaneously
+  // Compose gestures
   const pinchAndRotate = Gesture.Simultaneous(pinchGesture, rotationGesture);
-
-  // 2. Combine drag and tap as exclusive (only one can work at a time)
   const dragAndTap = Gesture.Exclusive(dragGesture, tapGesture);
-
-  // 3. Make the combined gestures race with each other
-  // This allows either single-finger or two-finger gestures to be recognized
-  // depending on how many fingers are used
   const composed = Gesture.Race(pinchAndRotate, dragAndTap);
 
   // Combined animated style
@@ -128,7 +159,7 @@ const DraggableClothingItem = ({ item, transform, canvasLayout, onUpdate, onDele
 
   return (
     <GestureDetector gesture={composed}>
-      <Animated.View style={[styles.container, rStyle]}>
+      <Animated.View style={[styles.container, rStyle, style]}>
         {/* Main Image Area */}
         <View style={[styles.imageContainer, isSelected && styles.selected]}>
           <Image

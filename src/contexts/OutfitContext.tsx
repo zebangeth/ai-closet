@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Outfit } from "../types/Outfit";
+import { Outfit, OutfitItem } from "../types/Outfit";
 
 type TagData = {
   tag: string;
@@ -27,12 +27,14 @@ type OutfitContextType = {
   addOutfit: (outfit: Outfit) => void;
   updateOutfit: (outfit: Outfit) => void;
   deleteOutfit: (id: string) => void;
+
+  // Helper functions
+  getMaxZIndex: (outfitId: string) => number; // Added helper function
 };
 
 export const OutfitContext = createContext<OutfitContextType | null>(null);
 
 export const OutfitProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // State
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [activeFilters, setActiveFilters] = useState<OutfitFilters>({
     tags: [],
@@ -130,6 +132,17 @@ export const OutfitProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setOutfits((prev) => prev.filter((outfit) => outfit.id !== id));
   }, []);
 
+  // Helper function to get max zIndex for an outfit
+  const getMaxZIndex = useCallback(
+    (outfitId: string) => {
+      const outfit = outfits.find((o) => o.id === outfitId);
+      if (!outfit) return 0;
+
+      return Math.max(0, ...outfit.clothingItems.map((item) => item.zIndex));
+    },
+    [outfits]
+  );
+
   const contextValue = {
     outfits,
     tagData,
@@ -141,6 +154,7 @@ export const OutfitProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     addOutfit,
     updateOutfit,
     deleteOutfit,
+    getMaxZIndex,
   };
 
   return <OutfitContext.Provider value={contextValue}>{children}</OutfitContext.Provider>;

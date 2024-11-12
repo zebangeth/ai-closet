@@ -1,37 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
 import { OutfitStackScreenProps } from "../types/navigation";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import AddClothingItemOverlay from "../components/outfit/AddClothingItemOverlay";
 import OutfitCanvas from "../components/outfit/OutfitCanvas";
+import { ClothingContext } from "../contexts/ClothingContext";
+import { OutfitContext } from "../contexts/OutfitContext";
 import { ClothingItem } from "../types/ClothingItem";
-import { OutfitItem } from "../types/Outfit";
+import { Outfit, OutfitItem } from "../types/Outfit";
+import { v4 as uuidv4 } from "uuid";
+
+const ITEM_SIZE = 150; // Default item size
 
 type Props = OutfitStackScreenProps<"OutfitCanvas">;
-
-type CanvasItem = {
-  clothingItem: ClothingItem;
-  transform: OutfitItem["transform"];
-};
 
 const OutfitCanvasScreen = ({ navigation, route }: Props) => {
   const isEditing = !!route.params?.id;
   const [isAddItemsVisible, setIsAddItemsVisible] = useState(false);
-  const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
+  const [canvasItems, setCanvasItems] = useState<OutfitItem[]>([]);
+  const [canvasLayout, setCanvasLayout] = useState({ width: 0, height: 0 });
+
+  const clothingContext = useContext(ClothingContext);
+  const outfitContext = useContext(OutfitContext);
+
+  if (!clothingContext || !outfitContext) {
+    return <Text>Loading...</Text>;
+  }
+
+  // If editing, load the existing outfit
+  useEffect(() => {
+    if (isEditing && route.params?.id) {
+      const outfit = outfitContext.getOutfit(route.params.id);
+      if (outfit) {
+        setCanvasItems(outfit.clothingItems);
+      }
+    }
+  }, [isEditing, route.params?.id]);
+
+  // Create a map of clothing items for quick lookup
+  const clothingItemsMap = clothingContext.clothingItems.reduce((map, item) => {
+    map[item.id] = item;
+    return map;
+  }, {} as Record<string, ClothingItem>);
 
   const handleSelectItem = (item: ClothingItem) => {
-    // Add new item to the canvas center with default transform
-    const newItem: CanvasItem = {
-      clothingItem: item,
+    const newItem: OutfitItem = {
+      id: item.id,
       transform: {
-        x: 0,
-        y: 0,
+        x: canvasLayout.width / 2 - ITEM_SIZE / 2, // Center X
+        y: canvasLayout.height / 2 - ITEM_SIZE / 2, // Center Y
         scale: 1,
         rotation: 0,
       },
+      zIndex: canvasItems.length + 1, // New items appear on top
     };
     setCanvasItems((prev) => [...prev, newItem]);
   };
@@ -40,6 +65,14 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     setCanvasItems((prev) => {
       const newItems = [...prev];
       newItems[index] = { ...newItems[index], transform };
+      return newItems;
+    });
+  };
+
+  const handleUpdateZIndex = (index: number, zIndex: number) => {
+    setCanvasItems((prev) => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], zIndex };
       return newItems;
     });
   };
@@ -57,17 +90,42 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     ]);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (canvasItems.length === 0) {
       Alert.alert("Error", "Please add at least one item to the outfit");
       return;
     }
-    // TODO: Implement save functionality
-    console.log("Saving outfit:", canvasItems);
+
+    try {
+      // TODO: Generate outfit preview image
+      const outfitImageUri = ""; // This should be implemented
+
+      const outfit: Outfit = {
+        id: isEditing ? route.params!.id! : uuidv4(),
+        imageUri: outfitImageUri,
+        createdAt: isEditing ? outfitContext.getOutfit(route.params!.id!)!.createdAt : new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        clothingItems: canvasItems,
+        tags: [],
+        season: [],
+        occasion: [],
+      };
+
+      if (isEditing) {
+        outfitContext.updateOutfit(outfit);
+      } else {
+        outfitContext.addOutfit(outfit);
+      }
+
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error saving outfit:", error);
+      Alert.alert("Error", "Failed to save outfit");
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} onLayout={(e) => setCanvasLayout(e.nativeEvent.layout)}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
@@ -80,9 +138,15 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
       </View>
 
       {/* Canvas Area */}
-      <View style={styles.canvasArea}>
-        <OutfitCanvas items={canvasItems} onUpdateItem={handleUpdateItem} onDeleteItem={handleDeleteItem} />
-      </View>
+      <GestureHandlerRootView style={styles.canvasArea}>
+        <OutfitCanvas
+          items={canvasItems}
+          clothingItems={clothingItemsMap}
+          onUpdateItem={handleUpdateItem}
+          onDeleteItem={handleDeleteItem}
+          onUpdateZIndex={handleUpdateZIndex}
+        />
+      </GestureHandlerRootView>
 
       {/* Bottom Buttons */}
       <View style={styles.bottomButtons}>
@@ -127,16 +191,7 @@ const styles = StyleSheet.create({
   },
   canvasArea: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.thumbnail_background,
     margin: 16,
-    borderRadius: 12,
-  },
-  placeholderText: {
-    fontSize: 16,
-    fontFamily: typography.medium,
-    color: colors.text_gray,
   },
   bottomButtons: {
     flexDirection: "row",

@@ -6,6 +6,7 @@ export interface OutfitItem {
     scale: number;
     rotation: number;
   };
+  zIndex: number;
 }
 
 export interface Outfit {
@@ -13,7 +14,7 @@ export interface Outfit {
   imageUri: string;
   createdAt: string;
   updatedAt: string;
-  clothingItems: OutfitItem[]; // Array of clothing item references with their canvas positions
+  clothingItems: OutfitItem[]; // Array of clothing item references with their canvas positions and zIndex
   tags: string[]; // custom tags, e.g., 'summer looks', 'date night'
   season: string[]; // Spring, Summer, Fall, Winter
   occasion: string[]; // Casual, Work, Formal, Party
