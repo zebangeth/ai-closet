@@ -1,22 +1,69 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { OutfitStackScreenProps } from "../types/navigation";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import AddClothingItemOverlay from "../components/outfit/AddClothingItemOverlay";
+import OutfitCanvas from "../components/outfit/OutfitCanvas";
 import { ClothingItem } from "../types/ClothingItem";
+import { OutfitItem } from "../types/Outfit";
 
 type Props = OutfitStackScreenProps<"OutfitCanvas">;
+
+type CanvasItem = {
+  clothingItem: ClothingItem;
+  transform: OutfitItem["transform"];
+};
 
 const OutfitCanvasScreen = ({ navigation, route }: Props) => {
   const isEditing = !!route.params?.id;
   const [isAddItemsVisible, setIsAddItemsVisible] = useState(false);
+  const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
 
   const handleSelectItem = (item: ClothingItem) => {
-    // TODO: Add the selected item to the canvas
-    console.log("Selected item:", item);
+    // Add new item to the canvas center with default transform
+    const newItem: CanvasItem = {
+      clothingItem: item,
+      transform: {
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotation: 0,
+      },
+    };
+    setCanvasItems((prev) => [...prev, newItem]);
+  };
+
+  const handleUpdateItem = (index: number, transform: OutfitItem["transform"]) => {
+    setCanvasItems((prev) => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], transform };
+      return newItems;
+    });
+  };
+
+  const handleDeleteItem = (index: number) => {
+    Alert.alert("Delete Item", "Are you sure you want to remove this item from the outfit?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          setCanvasItems((prev) => prev.filter((_, i) => i !== index));
+        },
+      },
+    ]);
+  };
+
+  const handleSave = () => {
+    if (canvasItems.length === 0) {
+      Alert.alert("Error", "Please add at least one item to the outfit");
+      return;
+    }
+    // TODO: Implement save functionality
+    console.log("Saving outfit:", canvasItems);
   };
 
   return (
@@ -27,14 +74,14 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
           <MaterialIcons name="arrow-back" size={24} color={colors.icon_stroke} />
         </TouchableOpacity>
         <Text style={styles.title}>Outfit Canvas</Text>
-        <TouchableOpacity onPress={() => {}} style={styles.headerButton}>
+        <TouchableOpacity onPress={handleSave} style={styles.headerButton}>
           <MaterialIcons name="save" size={24} color={colors.icon_stroke} />
         </TouchableOpacity>
       </View>
 
-      {/* Canvas Area Placeholder */}
+      {/* Canvas Area */}
       <View style={styles.canvasArea}>
-        <Text style={styles.placeholderText}>Canvas Area</Text>
+        <OutfitCanvas items={canvasItems} onUpdateItem={handleUpdateItem} onDeleteItem={handleDeleteItem} />
       </View>
 
       {/* Bottom Buttons */}
@@ -42,7 +89,7 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
         <TouchableOpacity style={styles.button} onPress={() => setIsAddItemsVisible(true)}>
           <Text style={styles.buttonText}>Add Items</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>Save Outfit</Text>
         </TouchableOpacity>
       </View>

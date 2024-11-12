@@ -10,6 +10,8 @@ import AppNavigator from "./src/navigation";
 import { ClothingProvider } from "./src/contexts/ClothingContext";
 import { VirtualTryOnProvider } from "./src/contexts/VirtualTryOnContext";
 import { OutfitProvider } from "./src/contexts/OutfitContext";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StyleSheet } from "react-native";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,12 +26,20 @@ export default function App() {
   }
 
   return (
-    <ClothingProvider>
-      <OutfitProvider>
-        <VirtualTryOnProvider>
-          <AppNavigator />
-        </VirtualTryOnProvider>
-      </OutfitProvider>
-    </ClothingProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <ClothingProvider>
+        <OutfitProvider>
+          <VirtualTryOnProvider>
+            <AppNavigator />
+          </VirtualTryOnProvider>
+        </OutfitProvider>
+      </ClothingProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
