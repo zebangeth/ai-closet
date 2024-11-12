@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     backgroundColor: colors.screen_background,
-    marginTop: 100, // Leave some space at the top
+    marginTop: 160,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },

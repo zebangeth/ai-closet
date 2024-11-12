@@ -91,16 +91,7 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
   };
 
   const handleDeleteItem = (index: number) => {
-    Alert.alert("Delete Item", "Are you sure you want to remove this item from the outfit?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          setCanvasItems((prev) => prev.filter((_, i) => i !== index));
-        },
-      },
-    ]);
+    setCanvasItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   const captureCanvas = async (): Promise<string> => {

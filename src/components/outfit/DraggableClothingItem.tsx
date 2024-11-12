@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Image, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, runOnJS } from "react-native-reanimated";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { ClothingItem } from "../../types/ClothingItem";
 import { OutfitItem } from "../../types/Outfit";
@@ -21,7 +21,7 @@ type Props = {
 const CONTROL_BUTTON_SIZE = 24;
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 3;
-const ITEM_SIZE = 150; // Default item size
+const DEFAULT_ITEM_SIZE = 260;
 
 const DraggableClothingItem = ({
   item,
@@ -75,7 +75,7 @@ const DraggableClothingItem = ({
       const newY = savedValues.value.translationY + e.translationY;
 
       // Calculate bounds for the center of the item
-      const scaledSize = ITEM_SIZE * scale.value;
+      const scaledSize = DEFAULT_ITEM_SIZE * scale.value;
       const halfItemSize = scaledSize / 2;
       const minX = -halfItemSize;
       const maxX = canvasLayout.width - halfItemSize;
@@ -111,7 +111,7 @@ const DraggableClothingItem = ({
         scale.value = newScale;
 
         // Recalculate position bounds after scaling
-        const scaledSize = ITEM_SIZE * newScale;
+        const scaledSize = DEFAULT_ITEM_SIZE * newScale;
         const halfItemSize = scaledSize / 2;
         const minX = -halfItemSize;
         const maxX = canvasLayout.width - halfItemSize;
@@ -172,8 +172,8 @@ const DraggableClothingItem = ({
         {/* Delete Button */}
         {isSelected && (
           <GestureDetector gesture={Gesture.Tap().onStart(() => runOnJS(onDelete)())}>
-            <View style={[styles.controlButton, styles.deleteButton]}>
-              <MaterialIcons name="close" size={20} color="white" />
+            <View style={styles.deleteButton}>
+              <Entypo name="cross" size={20} color={colors.icon_stroke} />
             </View>
           </GestureDetector>
         )}
@@ -185,8 +185,8 @@ const DraggableClothingItem = ({
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    width: ITEM_SIZE,
-    height: ITEM_SIZE,
+    width: DEFAULT_ITEM_SIZE,
+    height: DEFAULT_ITEM_SIZE,
   },
   imageContainer: {
     width: "100%",
@@ -203,27 +203,16 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  controlButton: {
+  deleteButton: {
     position: "absolute",
     width: CONTROL_BUTTON_SIZE,
     height: CONTROL_BUTTON_SIZE,
     borderRadius: CONTROL_BUTTON_SIZE / 2,
-    backgroundColor: colors.primary_yellow,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  deleteButton: {
     top: -CONTROL_BUTTON_SIZE / 2,
     right: -CONTROL_BUTTON_SIZE / 2,
-    backgroundColor: "#FF4444",
+    backgroundColor: colors.primary_yellow,
   },
 });
 
