@@ -9,6 +9,7 @@ import { ClothingItem } from "../types/ClothingItem";
 import { ClosetStackScreenProps } from "../types/navigation";
 import ClothingItemThumbnail from "../components/clothing/ClothingItemThumbnail";
 import AnimatedAddButton from "../components/common/AnimatedAddButton";
+import TagFilterSection from "../components/common/TagFilterSection";
 import { categories } from "../data/categories";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -24,26 +25,11 @@ interface CategoryTabProps {
   count: number;
 }
 
-interface TagChipProps {
-  name: string;
-  isSelected: boolean;
-  onPress: () => void;
-  count: number;
-}
-
-// Subcomponents
+// CategoryTab Subcomponent
 const CategoryTab = ({ name, isSelected, onPress, count }: CategoryTabProps) => (
   <Pressable style={[styles.categoryTab, isSelected && styles.categoryTabSelected]} onPress={onPress}>
     <Text style={[styles.categoryTabText, isSelected && styles.categoryTabTextSelected]}>{name}</Text>
     <Text style={[styles.categoryCount, isSelected && styles.categoryCountSelected]}>{count}</Text>
-  </Pressable>
-);
-
-const TagChip = ({ name, isSelected, onPress, count }: TagChipProps) => (
-  <Pressable style={[styles.tagChip, isSelected && styles.tagChipSelected]} onPress={onPress}>
-    <Text style={[styles.tagChipText, isSelected && styles.tagChipTextSelected]}>
-      {name} ({count})
-    </Text>
   </Pressable>
 );
 
@@ -122,6 +108,16 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
     }
   };
 
+  const handleTagPress = (tag: string) => {
+    const currentTags = activeFilters.tags || [];
+    const newTags = currentTags.includes(tag) ? currentTags.filter((t) => t !== tag) : [...currentTags, tag];
+    setFilter("tags", newTags);
+  };
+
+  const renderItem = ({ item }: { item: ClothingItem }) => (
+    <ClothingItemThumbnail item={item} onPress={() => navigation.navigate("ClothingDetail", { id: item.id })} />
+  );
+
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
   return (
@@ -158,38 +154,13 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
         ))}
       </ScrollView>
 
-      {/* Tags Section */}
-      {tagData.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.tagsContainer}
-          contentContainerStyle={styles.tagsContent}
-        >
-          {tagData.map(({ tag, count }) => (
-            <TagChip
-              key={tag}
-              name={tag}
-              isSelected={(activeFilters.tags || []).includes(tag)}
-              onPress={() => {
-                const currentTags = activeFilters.tags || [];
-                const newTags = currentTags.includes(tag)
-                  ? currentTags.filter((t) => t !== tag)
-                  : [...currentTags, tag];
-                setFilter("tags", newTags);
-              }}
-              count={count}
-            />
-          ))}
-        </ScrollView>
-      )}
+      {/* Tag Filter Section */}
+      <TagFilterSection tagData={tagData} selectedTags={activeFilters.tags || []} onTagPress={handleTagPress} />
 
       {/* Clothing Grid */}
       <FlatList
         data={filteredItems}
-        renderItem={({ item }) => (
-          <ClothingItemThumbnail item={item} onPress={() => navigation.navigate("ClothingDetail", { id: item.id })} />
-        )}
+        renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={3}
         contentContainerStyle={styles.gridContent}
@@ -264,38 +235,6 @@ const styles = StyleSheet.create({
   },
   categoryCountSelected: {
     color: colors.text_primary,
-  },
-  tagsContainer: {
-    maxHeight: 38,
-    marginTop: 8,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderColor: colors.divider_light,
-  },
-  tagsContent: {
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  tagChip: {
-    height: 30,
-    flexDirection: "row",
-    backgroundColor: colors.tag_light,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    marginRight: 8,
-  },
-  tagChipSelected: {
-    backgroundColor: colors.tag_dark,
-  },
-  tagChipText: {
-    fontFamily: typography.regular,
-    fontSize: 14,
-    color: colors.tag_light_text,
-  },
-  tagChipTextSelected: {
-    color: colors.tag_dark_text,
   },
   gridContent: {
     paddingTop: 6,

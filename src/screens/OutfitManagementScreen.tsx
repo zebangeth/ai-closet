@@ -6,9 +6,9 @@ import { OutfitContext } from "../contexts/OutfitContext";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import AddButton from "../components/common/AddButton";
-import TagChips from "../components/common/TagChips";
 import OutfitThumbnail from "../components/outfit/OutfitThumbnail";
 import { OutfitStackScreenProps } from "../types/navigation";
+import TagFilterSection from "../components/common/TagFilterSection";
 
 type Props = OutfitStackScreenProps<"OutfitManagement">;
 
@@ -28,6 +28,29 @@ const OutfitManagementScreen = ({ navigation }: Props) => {
 
   const { tagData, filteredOutfits, activeFilters, setFilter } = context;
 
+  const handleTagPress = (tag: string) => {
+    const currentTags = activeFilters.tags || [];
+    const newTags = currentTags.includes(tag) ? currentTags.filter((t) => t !== tag) : [...currentTags, tag];
+    setFilter("tags", newTags);
+  };
+
+  const renderItem = ({ item, index }: { item: any; index: number }) => {
+    // Add margin to first item of each row
+    const isFirstInRow = index % 2 === 0;
+    const style = isFirstInRow ? { marginRight: GRID_SPACING / 2 } : { marginLeft: GRID_SPACING / 2 };
+
+    return (
+      <View style={style}>
+        <OutfitThumbnail
+          outfit={item}
+          width={ITEM_WIDTH}
+          height={ITEM_HEIGHT}
+          onPress={() => navigation.navigate("OutfitDetail", { id: item.id })}
+        />
+      </View>
+    );
+  };
+
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
   return (
@@ -40,41 +63,16 @@ const OutfitManagementScreen = ({ navigation }: Props) => {
         </Pressable>
       </View>
 
-      {/* Tags Section */}
-      {tagData.length > 0 && (
-        <View style={styles.tagsSection}>
-          <TagChips
-            tags={activeFilters.tags || []}
-            onAddTag={(tag) => {
-              const currentTags = activeFilters.tags || [];
-              setFilter("tags", [...currentTags, tag]);
-            }}
-            onRemoveTag={(tag) => {
-              const currentTags = activeFilters.tags || [];
-              setFilter(
-                "tags",
-                currentTags.filter((t) => t !== tag)
-              );
-            }}
-          />
-        </View>
-      )}
+      {/* Tags Filter Section */}
+      <TagFilterSection tagData={tagData} selectedTags={activeFilters.tags || []} onTagPress={handleTagPress} />
 
       {/* Outfit Grid */}
       <FlatList
         data={filteredOutfits}
-        renderItem={({ item }) => (
-          <OutfitThumbnail
-            outfit={item}
-            width={ITEM_WIDTH}
-            height={ITEM_HEIGHT}
-            onPress={() => navigation.navigate("OutfitDetail", { id: item.id })}
-          />
-        )}
+        renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={2}
+        numColumns={COLUMN_COUNT}
         contentContainerStyle={styles.gridContent}
-        columnWrapperStyle={styles.gridRow}
       />
 
       {/* Add Button */}
@@ -104,17 +102,8 @@ const styles = StyleSheet.create({
   filterButton: {
     padding: 8,
   },
-  tagsSection: {
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider_light,
-  },
   gridContent: {
     padding: GRID_PADDING,
-  },
-  gridRow: {
-    justifyContent: "space-between",
-    marginBottom: GRID_SPACING,
   },
 });
 
