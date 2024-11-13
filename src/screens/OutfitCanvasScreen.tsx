@@ -134,20 +134,36 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
       setIsSaving(true);
       const outfitImageUri = await captureCanvas();
 
-      const outfit: Outfit = {
-        id: isEditing ? route.params!.id! : uuidv4(),
-        imageUri: outfitImageUri,
-        createdAt: isEditing ? outfitContext.getOutfit(route.params!.id!)!.createdAt : new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        clothingItems: canvasItems,
-        tags: [],
-        season: [],
-        occasion: [],
-      };
+      let outfit: Outfit;
+      const now = new Date().toISOString();
 
-      if (isEditing) {
+      if (isEditing && route.params?.id) {
+        // Get the existing outfit to preserve its attributes
+        const existingOutfit = outfitContext.getOutfit(route.params.id);
+        if (!existingOutfit) {
+          throw new Error("Outfit not found");
+        }
+
+        // Update the existing outfit while preserving other attributes
+        outfit = {
+          ...existingOutfit, // Preserve all existing attributes
+          imageUri: outfitImageUri, // Update with new image
+          clothingItems: canvasItems, // Update with new items arrangement
+          updatedAt: now, // Update timestamp
+        };
         outfitContext.updateOutfit(outfit);
       } else {
+        // Create a new outfit
+        outfit = {
+          id: uuidv4(),
+          imageUri: outfitImageUri,
+          createdAt: now,
+          updatedAt: now,
+          clothingItems: canvasItems,
+          tags: [], // Initialize with empty arrays for new outfits
+          season: [],
+          occasion: [],
+        };
         outfitContext.addOutfit(outfit);
       }
 
