@@ -12,11 +12,35 @@ import OutfitManagementScreen from "../screens/OutfitManagementScreen";
 import OutfitCanvasScreen from "../screens/OutfitCanvasScreen";
 import OutfitDetailScreen from "../screens/OutfitDetailScreen";
 import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
-import { RootTabParamList, ClosetStackParamList, OutfitStackParamList } from "../types/navigation";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 
-const Tab = createBottomTabNavigator<RootTabParamList>();
+// Update the navigation types
+type RootStackParamList = {
+  MainTabs: undefined;
+  ClothingDetailModal: { id: string };
+};
+
+type MainTabParamList = {
+  Closet: undefined;
+  Outfits: undefined;
+  "Try-On": undefined;
+  Profile: undefined;
+};
+
+type ClosetStackParamList = {
+  ClothingManagement: undefined;
+  ClothingDetail: { id: string };
+};
+
+type OutfitStackParamList = {
+  OutfitManagement: undefined;
+  OutfitCanvas: { id?: string };
+  OutfitDetail: { id: string };
+};
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
 const OutfitStack = createNativeStackNavigator<OutfitStackParamList>();
 
@@ -38,49 +62,59 @@ const OutfitStackNavigator = () => (
   </OutfitStack.Navigator>
 );
 
-// Main Navigation Container
+// Main Tab Navigator
+const MainTabNavigator = () => (
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: false,
+      tabBarStyle: styles.tabBar,
+      tabBarActiveTintColor: colors.text_primary,
+      tabBarInactiveTintColor: colors.text_gray,
+      tabBarLabelStyle: styles.tabBarLabel,
+      tabBarIconStyle: styles.tabBarIcon,
+    }}
+  >
+    <Tab.Screen
+      name="Closet"
+      component={ClosetStackNavigator}
+      options={{
+        tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="wardrobe" size={size} color={color} />,
+      }}
+    />
+    <Tab.Screen
+      name="Outfits"
+      component={OutfitStackNavigator}
+      options={{
+        tabBarIcon: ({ color, size }) => <MaterialIcons name="style" size={size} color={color} />,
+      }}
+    />
+    <Tab.Screen
+      name="Try-On"
+      component={VirtualTryOnScreen}
+      options={{
+        tabBarIcon: ({ color, size }) => <FontAwesome6 name="wand-magic-sparkles" size={20} color={color} />,
+      }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={ProfileScreen}
+      options={{
+        tabBarIcon: ({ color, size }) => <MaterialIcons name="person" size={size} color={color} />,
+      }}
+    />
+  </Tab.Navigator>
+);
+
+// Root Navigator
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: styles.tabBar,
-          tabBarActiveTintColor: colors.text_primary,
-          tabBarInactiveTintColor: colors.text_gray,
-          tabBarLabelStyle: styles.tabBarLabel,
-          tabBarIconStyle: styles.tabBarIcon,
-        }}
-      >
-        <Tab.Screen
-          name="Closet"
-          component={ClosetStackNavigator}
-          options={{
-            tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="wardrobe" size={size} color={color} />,
-          }}
-        />
-        <Tab.Screen
-          name="Outfits"
-          component={OutfitStackNavigator}
-          options={{
-            tabBarIcon: ({ color, size }) => <MaterialIcons name="style" size={size} color={color} />,
-          }}
-        />
-        <Tab.Screen
-          name="Try-On"
-          component={VirtualTryOnScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => <FontAwesome6 name="wand-magic-sparkles" size={20} color={color} />,
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => <MaterialIcons name="person" size={size} color={color} />,
-          }}
-        />
-      </Tab.Navigator>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="MainTabs" component={MainTabNavigator} />
+        <RootStack.Group screenOptions={{ presentation: "modal" }}>
+          <RootStack.Screen name="ClothingDetailModal" component={ClothingDetailScreen} />
+        </RootStack.Group>
+      </RootStack.Navigator>
     </NavigationContainer>
   );
 };

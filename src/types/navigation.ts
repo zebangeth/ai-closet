@@ -2,11 +2,17 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
+// Root Stack Navigator Types
+export type RootStackParamList = {
+  MainTabs: undefined;
+  ClothingDetailModal: { id: string };
+};
+
 // Root Tab Navigator Types
-export type RootTabParamList = {
+export type MainTabParamList = {
   Closet: NavigatorScreenParams<ClosetStackParamList>;
   Outfits: NavigatorScreenParams<OutfitStackParamList>;
-  "Try-On": undefined; // Single screen, no nested navigation
+  "Try-On": undefined;
   Profile: undefined;
 };
 
@@ -22,15 +28,20 @@ export type OutfitStackParamList = {
   OutfitDetail: { id: string };
 };
 
-// Screen Props Types - Using CompositeScreenProps for nested navigation
-export type RootTabScreenProps<T extends keyof RootTabParamList> = BottomTabScreenProps<RootTabParamList, T>;
+// Screen Props Types
+export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, T>;
+
+export type MainTabScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, T>,
+  NativeStackScreenProps<RootStackParamList>
+>;
 
 export type ClosetStackScreenProps<T extends keyof ClosetStackParamList> = CompositeScreenProps<
   NativeStackScreenProps<ClosetStackParamList, T>,
-  BottomTabScreenProps<RootTabParamList>
+  CompositeScreenProps<BottomTabScreenProps<MainTabParamList>, NativeStackScreenProps<RootStackParamList>>
 >;
 
 export type OutfitStackScreenProps<T extends keyof OutfitStackParamList> = CompositeScreenProps<
   NativeStackScreenProps<OutfitStackParamList, T>,
-  BottomTabScreenProps<RootTabParamList>
+  CompositeScreenProps<BottomTabScreenProps<MainTabParamList>, NativeStackScreenProps<RootStackParamList>>
 >;

@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { ClothingContext } from "../contexts/ClothingContext";
-import { ClosetStackScreenProps } from "../types/navigation";
+import { ClosetStackScreenProps, RootStackScreenProps } from "../types/navigation";
 import { ClothingItem } from "../types/ClothingItem";
 import { colors } from "../styles/colors";
 import TagChips from "../components/common/TagChips";
@@ -25,11 +25,15 @@ import { colors as colorOptions, seasons, occasions } from "../data/options";
 import { brands as brandSuggestions } from "../data/suggestions";
 import { typography } from "../styles/globalStyles";
 
-type Props = ClosetStackScreenProps<"ClothingDetail">;
+// Accept both stack and modal navigation props
+type Props = ClosetStackScreenProps<"ClothingDetail"> | RootStackScreenProps<"ClothingDetailModal">;
 
 const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const { id } = route.params;
   const context = useContext(ClothingContext);
+
+  // Determine if we're in modal mode by checking the route name
+  const isModal = route.name === "ClothingDetailModal";
 
   if (!context) {
     return <Text>Loading...</Text>;
@@ -89,7 +93,8 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
     setIsDirty(true);
   };
 
-  const safeAreaEdges: Edge[] = ["top", "left", "right"];
+  // Remove SafeAreaView for the top edge in modal mode
+  const safeAreaEdges: Edge[] = isModal ? ["left", "right"] : ["top", "left", "right"];
 
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>

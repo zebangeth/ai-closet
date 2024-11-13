@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert, Pressable } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types/navigation";
 import { OutfitContext } from "../contexts/OutfitContext";
 import { OutfitStackScreenProps } from "../types/navigation";
 import { Outfit } from "../types/Outfit";
@@ -84,6 +86,13 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
     navigation.navigate("OutfitCanvas", { id });
   };
 
+  const handleClothingItemPress = (itemId: string) => {
+    // Get the root navigation and navigate to the modal
+    navigation
+      .getParent<NativeStackNavigationProp<RootStackParamList>>()
+      ?.navigate("ClothingDetailModal", { id: itemId });
+  };
+
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
   return (
@@ -149,10 +158,7 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
               if (!clothingItem) return null;
               return (
                 <View key={item.id} style={styles.itemThumbnail}>
-                  <ClothingItemThumbnail
-                    item={clothingItem}
-                    onPress={() => navigation.navigate("Closet", { screen: "ClothingDetail", params: { id: item.id } })}
-                  />
+                  <ClothingItemThumbnail item={clothingItem} onPress={() => handleClothingItemPress(item.id)} />
                 </View>
               );
             })}
@@ -213,7 +219,7 @@ const styles = StyleSheet.create({
   editOverlay: {
     position: "absolute",
     bottom: 16,
-    left: 16,
+    right: 16,
     backgroundColor: colors.primary_yellow,
     flexDirection: "row",
     alignItems: "center",
@@ -248,11 +254,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   itemsScroll: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 11,
   },
   itemThumbnail: {
     width: 120,
-    marginRight: 12,
   },
   saveButton: {
     position: "absolute",
