@@ -15,34 +15,19 @@ import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 
-// Update the navigation types
-type RootStackParamList = {
-  MainTabs: undefined;
-  ClothingDetailModal: { id: string };
-};
-
-type MainTabParamList = {
-  Closet: undefined;
-  Outfits: undefined;
-  "Try-On": undefined;
-  Profile: undefined;
-};
-
-type ClosetStackParamList = {
-  ClothingManagement: undefined;
-  ClothingDetail: { id: string };
-};
-
-type OutfitStackParamList = {
-  OutfitManagement: undefined;
-  OutfitCanvas: { id?: string };
-  OutfitDetail: { id: string };
-};
+import {
+  RootStackParamList,
+  MainTabParamList,
+  ClosetStackParamList,
+  OutfitStackParamList,
+  TryOnStackParamList,
+} from "../types/navigation";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
 const OutfitStack = createNativeStackNavigator<OutfitStackParamList>();
+const TryOnStack = createNativeStackNavigator<TryOnStackParamList>();
 
 const ProfileScreen = () => <></>;
 
@@ -60,6 +45,12 @@ const OutfitStackNavigator = () => (
     <OutfitStack.Screen name="OutfitCanvas" component={OutfitCanvasScreen} />
     <OutfitStack.Screen name="OutfitDetail" component={OutfitDetailScreen} />
   </OutfitStack.Navigator>
+);
+
+const TryOnStackNavigator = () => (
+  <TryOnStack.Navigator screenOptions={{ headerShown: false }}>
+    <TryOnStack.Screen name="VirtualTryOn" component={VirtualTryOnScreen} />
+  </TryOnStack.Navigator>
 );
 
 // Main Tab Navigator
@@ -89,9 +80,10 @@ const MainTabNavigator = () => (
       }}
     />
     <Tab.Screen
-      name="Try-On"
-      component={VirtualTryOnScreen}
+      name="TryOn"
+      component={TryOnStackNavigator}
       options={{
+        tabBarLabel: "Try-On",
         tabBarIcon: ({ color, size }) => <FontAwesome6 name="wand-magic-sparkles" size={20} color={color} />,
       }}
     />

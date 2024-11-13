@@ -2,21 +2,19 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
-// Root Stack Navigator Types
 export type RootStackParamList = {
   MainTabs: undefined;
   ClothingDetailModal: { id: string };
+  SelectOutfitModal: undefined;
 };
 
-// Root Tab Navigator Types
 export type MainTabParamList = {
   Closet: NavigatorScreenParams<ClosetStackParamList>;
   Outfits: NavigatorScreenParams<OutfitStackParamList>;
-  "Try-On": undefined;
+  TryOn: NavigatorScreenParams<TryOnStackParamList>;
   Profile: undefined;
 };
 
-// Stack Navigator Types
 export type ClosetStackParamList = {
   ClothingManagement: undefined;
   ClothingDetail: { id: string };
@@ -26,6 +24,10 @@ export type OutfitStackParamList = {
   OutfitManagement: undefined;
   OutfitCanvas: { id?: string };
   OutfitDetail: { id: string };
+};
+
+export type TryOnStackParamList = {
+  VirtualTryOn: undefined;
 };
 
 // Screen Props Types
@@ -43,5 +45,10 @@ export type ClosetStackScreenProps<T extends keyof ClosetStackParamList> = Compo
 
 export type OutfitStackScreenProps<T extends keyof OutfitStackParamList> = CompositeScreenProps<
   NativeStackScreenProps<OutfitStackParamList, T>,
+  CompositeScreenProps<BottomTabScreenProps<MainTabParamList>, NativeStackScreenProps<RootStackParamList>>
+>;
+
+export type TryOnStackScreenProps<T extends keyof TryOnStackParamList> = CompositeScreenProps<
+  NativeStackScreenProps<TryOnStackParamList, T>,
   CompositeScreenProps<BottomTabScreenProps<MainTabParamList>, NativeStackScreenProps<RootStackParamList>>
 >;
