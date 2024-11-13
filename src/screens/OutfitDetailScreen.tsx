@@ -122,16 +122,16 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Main outfit image */}
-        <TouchableOpacity onPress={handleEditOutfit}>
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: localOutfit.imageUri }} style={styles.image} resizeMode="contain" />
-            <View style={styles.editOverlay}>
-              <MaterialIcons name="edit" size={24} color={colors.text_primary} />
-              <Text style={styles.editText}>Edit Outfit</Text>
+        {/* Main outfit image section */}
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: localOutfit.imageUri }} style={styles.image} resizeMode="contain" />
+          <TouchableOpacity style={styles.editButton} onPress={handleEditOutfit}>
+            <View style={styles.editButtonContent}>
+              <MaterialIcons name="edit" size={20} color={colors.text_primary} />
+              <Text style={styles.editButtonText}>Edit Outfit</Text>
             </View>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
 
         {/* Tags section */}
         <View style={[styles.section, { paddingTop: 14 }]}>
@@ -216,18 +216,28 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  editOverlay: {
+  editButton: {
     position: "absolute",
     bottom: 16,
     right: 16,
     backgroundColor: colors.primary_yellow,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  editButtonContent: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 8,
   },
-  editText: {
+  editButtonText: {
     marginLeft: 4,
     fontSize: 14,
     fontFamily: typography.medium,
