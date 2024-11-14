@@ -4,8 +4,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Platform, StyleSheet } from "react-native";
 import { MaterialIcons, MaterialCommunityIcons, FontAwesome6 } from "@expo/vector-icons";
-
-// Screens
 import ClothingManagementScreen from "../screens/ClothingManagementScreen";
 import ClothingDetailScreen from "../screens/ClothingDetailScreen";
 import OutfitManagementScreen from "../screens/OutfitManagementScreen";
@@ -14,7 +12,6 @@ import OutfitDetailScreen from "../screens/OutfitDetailScreen";
 import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
-
 import {
   RootStackParamList,
   MainTabParamList,
