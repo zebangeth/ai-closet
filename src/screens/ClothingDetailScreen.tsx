@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -10,8 +10,10 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ClothingContext } from "../contexts/ClothingContext";
 import { ClosetStackScreenProps, RootStackScreenProps } from "../types/navigation";
 import { ClothingItem } from "../types/ClothingItem";
@@ -27,6 +29,68 @@ import { typography } from "../styles/globalStyles";
 
 // Accept both stack and modal navigation props
 type Props = ClosetStackScreenProps<"ClothingDetail"> | RootStackScreenProps<"ClothingDetailModal">;
+
+// DetailField component for text input fields
+const DetailField = ({
+  label,
+  value,
+  onChangeText,
+  keyboardType = "default",
+  placeholder = "",
+}: {
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  keyboardType?: "default" | "numeric";
+  placeholder?: string;
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+
+  return (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <TouchableOpacity
+        style={[styles.valueContainer, isFocused && styles.valueContainerFocused]}
+        onPress={() => inputRef.current?.focus()}
+        activeOpacity={0.7}
+      >
+        <TextInput
+          ref={inputRef}
+          style={styles.detailValue}
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={keyboardType}
+          placeholder={placeholder}
+          placeholderTextColor={colors.text_gray}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
+        <MaterialCommunityIcons name="chevron-right" size={30} color={colors.text_gray} />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+// MultiSelectField component for seasons and occasions
+const MultiSelectField = ({
+  label,
+  selectedValues,
+  options,
+  onValueChange,
+}: {
+  label: string;
+  selectedValues: string[];
+  options: string[];
+  onValueChange: (values: string[]) => void;
+}) => (
+  <View style={styles.detailRow}>
+    <Text style={styles.detailLabel}>{label}</Text>
+    <View style={styles.multiSelectContainer}>
+      <MultiSelectToggle options={options} selectedValues={selectedValues} onValueChange={onValueChange} />
+    </View>
+  </View>
+);
 
 const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const { id } = route.params;
@@ -123,10 +187,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
       />
 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="always" // Allows tapping on suggestions without dismissing the keyboard
-        >
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <Image
             source={{
               uri: localItem.backgroundRemovedImageUri || localItem.imageUri,
@@ -135,7 +196,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
             style={styles.image}
           />
 
-          <View style={[styles.section, { paddingTop: 14 }]}>
+          <View style={styles.section}>
             <TagChips
               tags={localItem.tags}
               onAddTag={(tag) => {
@@ -153,8 +214,9 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Item Details</Text>
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Category</Text>
+            {/* Category */}
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Category</Text>
               <CategoryPicker
                 selectedCategory={localItem.category}
                 selectedSubcategory={localItem.subcategory}
@@ -162,72 +224,68 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                   handleFieldChange("category", category);
                   handleFieldChange("subcategory", subcategory);
                 }}
+                presentationType="inline"
               />
             </View>
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Color</Text>
-              <TextInput
-                style={styles.textInput}
-                value={localItem.color.join(", ")}
-                placeholder="Enter color(s)"
-                onChangeText={(text) =>
-                  handleFieldChange(
-                    "color",
-                    text.split(",").map((s) => s.trim())
-                  )
-                }
-              />
-            </View>
+            {/* Color */}
+            <DetailField
+              label="Color"
+              value={localItem.color.join(", ")}
+              onChangeText={(text) =>
+                handleFieldChange(
+                  "color",
+                  text.split(",").map((s) => s.trim())
+                )
+              }
+              placeholder="Enter color(s)"
+            />
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Season</Text>
-              <MultiSelectToggle
-                options={seasons}
-                selectedValues={localItem.season}
-                onValueChange={(selectedSeasons) => handleFieldChange("season", selectedSeasons)}
-              />
-            </View>
+            {/* Season */}
+            <MultiSelectField
+              label="Season"
+              selectedValues={localItem.season}
+              options={seasons}
+              onValueChange={(selectedSeasons) => handleFieldChange("season", selectedSeasons)}
+            />
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Occasion</Text>
-              <MultiSelectToggle
-                options={occasions}
-                selectedValues={localItem.occasion}
-                onValueChange={(selectedOccasions) => handleFieldChange("occasion", selectedOccasions)}
-              />
-            </View>
+            {/* Occasion */}
+            <MultiSelectField
+              label="Occasion"
+              selectedValues={localItem.occasion}
+              options={occasions}
+              onValueChange={(selectedOccasions) => handleFieldChange("occasion", selectedOccasions)}
+            />
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Brand</Text>
-              <TextInput
-                style={styles.textInput}
-                value={localItem.brand}
-                placeholder="Enter brand"
-                onChangeText={(text) => handleFieldChange("brand", text)}
-              />
-            </View>
+            {/* Brand */}
+            <DetailField
+              label="Brand"
+              value={localItem.brand}
+              onChangeText={(text) => handleFieldChange("brand", text)}
+              placeholder="Enter brand"
+            />
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Purchase Date</Text>
+            {/* Purchase Date */}
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Purchase Date</Text>
               <YearMonthPicker
                 selectedDate={localItem.purchaseDate}
                 onValueChange={(date) => handleFieldChange("purchaseDate", date)}
+                presentationType="inline"
               />
             </View>
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Price</Text>
-              <TextInput
-                style={styles.fieldInput}
-                value={localItem.price ? localItem.price.toString() : ""}
-                keyboardType="numeric"
-                onChangeText={(text) => {
-                  const numericValue = parseFloat(text);
-                  handleFieldChange("price", isNaN(numericValue) ? 0 : numericValue);
-                }}
-              />
-            </View>
+            {/* Price */}
+            <DetailField
+              label="Price"
+              value={localItem.price ? localItem.price.toString() : ""}
+              onChangeText={(text) => {
+                const numericValue = parseFloat(text);
+                handleFieldChange("price", isNaN(numericValue) ? 0 : numericValue);
+              }}
+              keyboardType="numeric"
+              placeholder="Enter price"
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -247,7 +305,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.screen_background,
   },
   scrollContent: {
-    paddingBottom: 60,
+    paddingBottom: 100,
   },
   image: {
     width: "100%",
@@ -255,36 +313,54 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F8",
   },
   section: {
-    paddingVertical: 8,
+    paddingVertical: 16,
   },
   sectionTitle: {
     fontFamily: typography.bold,
     fontSize: 18,
-    fontWeight: "bold",
+    color: colors.text_primary,
     paddingHorizontal: 16,
-    marginBottom: 8,
-  },
-  field: {
     marginBottom: 12,
-    paddingHorizontal: 16,
   },
-  fieldLabel: {
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingLeft: 16,
+  },
+  detailLabel: {
+    fontSize: 16,
     fontFamily: typography.medium,
-    fontSize: 16,
-    marginBottom: 4,
+    color: colors.text_primary,
+    flex: 2,
   },
-  textInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 8,
-    fontSize: 16,
+  valueContainer: {
+    flex: 3,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingRight: 16,
+    minHeight: 24,
   },
-  fieldInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 8,
+  valueContainerFocused: {
+    backgroundColor: colors.thumbnail_background,
+    marginVertical: -8,
+    paddingVertical: 8,
+    marginRight: 16,
+    paddingRight: -8,
+    borderRadius: 8,
+  },
+  detailValue: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: typography.regular,
+    color: colors.text_gray,
+    textAlign: "right",
+    marginRight: 8,
+  },
+  multiSelectContainer: {
+    flex: 3,
+    alignItems: "flex-end",
   },
   saveButton: {
     position: "absolute",
