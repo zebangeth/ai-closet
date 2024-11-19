@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList, Pressable } from "react-native";
 import { categories } from "../../data/categories";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { colors } from "../../styles/colors";
+import { typography } from "../../styles/globalStyles";
 
 type Props = {
   selectedCategory: string;
@@ -49,6 +51,7 @@ const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }
         <Text style={styles.inputText}>
           {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : "Select Category"}
         </Text>
+        <MaterialCommunityIcons name="chevron-down" size={24} color={colors.text_gray} />
       </TouchableOpacity>
 
       <Modal visible={isModalVisible} transparent animationType="slide">
@@ -61,13 +64,13 @@ const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Select Category</Text>
               <TouchableOpacity onPress={handleConfirm}>
-                <Text style={styles.headerButton}>Confirm</Text>
+                <Text style={[styles.headerButton, { color: colors.primary_yellow }]}>Done</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.pickerContent}>
               {/* Category List */}
-              <View style={styles.pickerContainer}>
+              <View style={[styles.pickerContainer, styles.leftPicker]}>
                 <FlatList
                   data={Object.keys(categories)}
                   keyExtractor={(item) => item}
@@ -79,17 +82,19 @@ const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }
                       <MaterialCommunityIcons
                         name={categoryIcons[item as CategoryKey]}
                         size={24}
-                        color="black"
+                        color={tempCategory === item ? colors.text_primary : colors.text_gray}
                         style={styles.icon}
                       />
-                      <Text style={styles.pickerItemText}>{item}</Text>
+                      <Text style={[styles.pickerItemText, tempCategory === item && styles.pickerItemTextSelected]}>
+                        {item}
+                      </Text>
                     </TouchableOpacity>
                   )}
                 />
               </View>
 
               {/* Subcategory List */}
-              <View style={styles.pickerContainer}>
+              <View style={[styles.pickerContainer, styles.rightPicker]}>
                 <FlatList
                   data={categories[tempCategory]}
                   keyExtractor={(item) => item}
@@ -98,7 +103,9 @@ const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }
                       style={[styles.pickerItem, tempSubcategory === item && styles.pickerItemSelected]}
                       onPress={() => setTempSubcategory(item)}
                     >
-                      <Text style={styles.pickerItemText}>{item}</Text>
+                      <Text style={[styles.pickerItemText, tempSubcategory === item && styles.pickerItemTextSelected]}>
+                        {item}
+                      </Text>
                     </TouchableOpacity>
                   )}
                 />
@@ -113,41 +120,52 @@ const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }
 
 const styles = StyleSheet.create({
   inputField: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 8,
-    justifyContent: "center",
+    borderColor: colors.border_gray,
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: colors.screen_background,
   },
   inputText: {
     fontSize: 16,
+    fontFamily: typography.regular,
+    color: colors.text_primary,
+    flex: 1,
   },
   modalOverlay: {
     flex: 1,
+    backgroundColor: colors.background_dim,
     justifyContent: "flex-end",
   },
   modalContainer: {
-    height: "40%", // Take half the screen
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    backgroundColor: colors.screen_background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: "50%",
+    overflow: "hidden",
   },
   headerBar: {
-    height: 50,
+    height: 56,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderColor: "#ccc",
+    borderColor: colors.divider_light,
+    backgroundColor: colors.screen_background,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: typography.bold,
+    color: colors.text_primary,
   },
   headerButton: {
     fontSize: 16,
-    color: "#007aff", // iOS default blue color
+    fontFamily: typography.medium,
+    color: colors.text_gray,
   },
   pickerContent: {
     flexDirection: "row",
@@ -156,20 +174,32 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flex: 1,
   },
+  leftPicker: {
+    borderRightWidth: 1,
+    borderColor: colors.divider_light,
+  },
+  rightPicker: {
+    backgroundColor: colors.thumbnail_background,
+  },
   pickerItem: {
     flexDirection: "row",
-    padding: 12,
     alignItems: "center",
+    padding: 16,
   },
   pickerItemSelected: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: colors.light_yellow,
   },
   pickerItemText: {
     fontSize: 16,
-    marginLeft: 8,
+    fontFamily: typography.regular,
+    color: colors.text_gray,
+  },
+  pickerItemTextSelected: {
+    fontFamily: typography.medium,
+    color: colors.text_primary,
   },
   icon: {
-    marginRight: 8,
+    marginRight: 12,
   },
 });
 
