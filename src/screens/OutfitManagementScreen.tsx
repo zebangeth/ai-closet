@@ -35,9 +35,10 @@ const OutfitManagementScreen = ({ navigation }: Props) => {
   };
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
-    // Add margin to first item of each row
     const isFirstInRow = index % 2 === 0;
-    const style = isFirstInRow ? { marginRight: GRID_SPACING / 2 } : { marginLeft: GRID_SPACING / 2 };
+    const style = isFirstInRow
+      ? { marginRight: GRID_SPACING / 2, marginBottom: GRID_SPACING }
+      : { marginLeft: GRID_SPACING / 2, marginBottom: GRID_SPACING };
 
     return (
       <View style={style}>
