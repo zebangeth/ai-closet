@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
+import PressableFade from "../common/PressableFade";
 
 type TryOnOption = {
   id: string;
@@ -48,14 +49,14 @@ const TryOnOptionSheet = ({ isVisible, onClose, onSelect }: Props) => {
       <View style={styles.sheet}>
         <View style={styles.header}>
           <Text style={styles.title}>Choose what to try on</Text>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <PressableFade onPress={onClose} style={styles.closeButton}>
             <MaterialIcons name="close" size={24} color={colors.icon_stroke} />
-          </TouchableOpacity>
+          </PressableFade>
         </View>
 
         <View style={styles.optionsList}>
           {tryOnOptions.map((option) => (
-            <TouchableOpacity
+            <PressableFade
               key={option.id}
               style={styles.optionItem}
               onPress={() => !option.isComingSoon && onSelect(option.id)}
@@ -75,7 +76,7 @@ const TryOnOptionSheet = ({ isVisible, onClose, onSelect }: Props) => {
                 </View>
                 <Text style={styles.optionDescription}>{option.description}</Text>
               </View>
-            </TouchableOpacity>
+            </PressableFade>
           ))}
         </View>
       </View>

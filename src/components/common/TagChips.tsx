@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
+import PressableFade from "./PressableFade";
 
 type Props = {
   tags: string[];
@@ -28,9 +29,9 @@ const TagChips = ({ tags, onAddTag, onRemoveTag }: Props) => {
         {tags.map((item) => (
           <View key={item} style={styles.chip}>
             <Text style={styles.chipText}>{item}</Text>
-            <TouchableOpacity onPress={() => onRemoveTag(item)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <PressableFade onPress={() => onRemoveTag(item)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <MaterialIcons name="close" size={16} color={colors.text_gray} />
-            </TouchableOpacity>
+            </PressableFade>
           </View>
         ))}
         {isAdding ? (
@@ -44,15 +45,15 @@ const TagChips = ({ tags, onAddTag, onRemoveTag }: Props) => {
               autoFocus
               placeholderTextColor={colors.text_gray}
             />
-            <TouchableOpacity onPress={handleAddTag}>
+            <PressableFade onPress={handleAddTag}>
               <MaterialIcons name="check" size={20} color={colors.primary_yellow} />
-            </TouchableOpacity>
+            </PressableFade>
           </View>
         ) : (
-          <TouchableOpacity style={styles.addButton} onPress={() => setIsAdding(true)}>
+          <PressableFade style={styles.addButton} onPress={() => setIsAdding(true)}>
             <MaterialIcons name="add" size={20} color={colors.primary_yellow} />
             <Text style={styles.addButtonText}>Add Tag</Text>
-          </TouchableOpacity>
+          </PressableFade>
         )}
       </ScrollView>
     </View>

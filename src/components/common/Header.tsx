@@ -1,7 +1,8 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
+import PressableFade from "./PressableFade";
 
 type Props = {
   onBack?: () => void;
@@ -11,14 +12,14 @@ type Props = {
 const Header = ({ onBack, onDelete }: Props) => (
   <View style={styles.container}>
     {onBack && (
-      <TouchableOpacity onPress={onBack}>
+      <PressableFade onPress={onBack}>
         <MaterialIcons name="arrow-back" size={24} color={colors.icon_stroke} />
-      </TouchableOpacity>
+      </PressableFade>
     )}
     {onDelete && (
-      <TouchableOpacity onPress={onDelete}>
+      <PressableFade onPress={onDelete}>
         <MaterialIcons name="delete" size={24} color={colors.icon_stroke} />
-      </TouchableOpacity>
+      </PressableFade>
     )}
   </View>
 );

@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
 import { VirtualTryOnItem } from "../../types/VirtualTryOn";
+import PressableFade from "../common/PressableFade";
 
 type Props = {
   items: VirtualTryOnItem[];
@@ -18,7 +19,7 @@ const RecentlyTriedSection = ({ items, onItemPress }: Props) => {
       <Text style={styles.title}>Recently Tried</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {items.map((item) => (
-          <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => onItemPress(item)}>
+          <PressableFade key={item.id} style={styles.itemContainer} onPress={() => onItemPress(item)}>
             <View style={styles.imageWrapper}>
               <Image source={{ uri: item.resultImageUri }} style={styles.image} resizeMode="cover" />
               <View style={styles.tryOnTypeTag}>
@@ -31,7 +32,7 @@ const RecentlyTriedSection = ({ items, onItemPress }: Props) => {
               </View>
             </View>
             <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-          </TouchableOpacity>
+          </PressableFade>
         ))}
       </ScrollView>
     </View>

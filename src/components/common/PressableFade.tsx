@@ -4,11 +4,20 @@ import { Pressable, Animated, StyleProp, ViewStyle, PressableProps } from "react
 interface Props extends Omit<PressableProps, "style"> {
   activeOpacity?: number;
   style?: StyleProp<ViewStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
   children: React.ReactNode;
 }
 
-const PressableFade = ({ activeOpacity = 0.7, style, onPress, children, disabled, ...props }: Props) => {
-  const DURATION = 175; // ms
+const PressableFade = ({
+  activeOpacity = 0.6,
+  style,
+  containerStyle,
+  onPress,
+  children,
+  disabled,
+  ...props
+}: Props) => {
+  const DURATION = 260;
   const opacityAnimation = useRef(new Animated.Value(1)).current;
 
   const fadeIn = () => {
@@ -28,7 +37,14 @@ const PressableFade = ({ activeOpacity = 0.7, style, onPress, children, disabled
   };
 
   return (
-    <Pressable onPress={onPress} onPressIn={fadeOut} onPressOut={fadeIn} disabled={disabled} {...props}>
+    <Pressable
+      onPress={onPress}
+      onPressIn={fadeOut}
+      onPressOut={fadeIn}
+      disabled={disabled}
+      style={containerStyle}
+      {...props}
+    >
       <Animated.View style={[style, { opacity: opacityAnimation }]}>{children}</Animated.View>
     </Pressable>
   );

@@ -1,7 +1,8 @@
 import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
+import PressableFade from "./PressableFade";
 
 type Props = {
   options: string[];
@@ -25,7 +26,7 @@ const MultiSelectToggle = ({ options, selectedValues, onValueChange }: Props) =>
       {options.map((option) => {
         const isSelected = selectedValues.includes(option);
         return (
-          <TouchableOpacity
+          <PressableFade
             key={option}
             style={[styles.button, isSelected && styles.buttonSelected]}
             onPress={() => toggleValue(option)}
@@ -36,7 +37,7 @@ const MultiSelectToggle = ({ options, selectedValues, onValueChange }: Props) =>
               )}
               <Text style={[styles.buttonText, isSelected && styles.buttonTextSelected]}>{option}</Text>
             </View>
-          </TouchableOpacity>
+          </PressableFade>
         );
       })}
     </ScrollView>

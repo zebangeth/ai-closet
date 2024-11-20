@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
+import PressableFade from "../common/PressableFade";
 
 type Props = {
   title: string;
@@ -14,7 +15,7 @@ type Props = {
 const ContentSelectionBox = ({ title, iconName, onPress, selectedImageUri }: Props) => (
   <View style={styles.container}>
     <Text style={styles.title}>{title}</Text>
-    <TouchableOpacity onPress={onPress} style={styles.selectionArea}>
+    <PressableFade onPress={onPress} style={styles.selectionArea}>
       {selectedImageUri ? (
         <Image source={{ uri: selectedImageUri }} style={styles.selectedImage} resizeMode="contain" />
       ) : (
@@ -25,7 +26,7 @@ const ContentSelectionBox = ({ title, iconName, onPress, selectedImageUri }: Pro
           <Text style={styles.addButtonText}>{title}</Text>
         </>
       )}
-    </TouchableOpacity>
+    </PressableFade>
   </View>
 );
 

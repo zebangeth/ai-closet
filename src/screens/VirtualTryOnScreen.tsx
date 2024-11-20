@@ -55,25 +55,28 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
   const handleOptionSelect = async (optionId: string) => {
     setOptionSheetVisible(false);
 
-    if (optionId === "discover") {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        Alert.alert("Permission Required", "Permission to access gallery is required!");
-        return;
-      }
+    // Add slight delay before showing picker to ensure smooth animation
+    setTimeout(async () => {
+      if (optionId === "discover") {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) {
+          Alert.alert("Permission Required", "Permission to access gallery is required!");
+          return;
+        }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false,
-        aspect: [3, 4],
-        quality: 1,
-      });
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: false,
+          aspect: [3, 4],
+          quality: 1,
+        });
 
-      if (!result.canceled) {
-        setSelectedOutfitUri(result.assets[0].uri);
-        setResultImageUri(undefined); // Clear previous result when new outfit is selected
+        if (!result.canceled) {
+          setSelectedOutfitUri(result.assets[0].uri);
+          setResultImageUri(undefined); // Clear previous result when new outfit is selected
+        }
       }
-    }
+    }, 300); // Wait for sheet close animation
   };
 
   const handlePhotoSelect = async () => {

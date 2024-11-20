@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from "react-native";
+import { View, Text, StyleSheet, LayoutAnimation } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
+import PressableFade from "../common/PressableFade";
 
 // TODO: Revise photo tips
 const tips = [
@@ -21,7 +22,7 @@ const PhotoTipsSection = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={toggleExpand} style={styles.header}>
+      <PressableFade onPress={toggleExpand} style={styles.header}>
         <View style={styles.titleContainer}>
           <MaterialIcons name="info" size={20} color={colors.text_gray} />
           <Text style={styles.title}>Photo Tips</Text>
@@ -31,7 +32,7 @@ const PhotoTipsSection = () => {
           size={24}
           color={colors.text_gray}
         />
-      </TouchableOpacity>
+      </PressableFade>
 
       {isExpanded && (
         <View style={styles.tipsContainer}>

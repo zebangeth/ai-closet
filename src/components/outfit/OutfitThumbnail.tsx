@@ -1,7 +1,8 @@
 import React from "react";
-import { TouchableOpacity, Image, StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { Outfit } from "../../types/Outfit";
 import { colors } from "../../styles/colors";
+import PressableFade from "../common/PressableFade";
 
 type Props = {
   outfit: Outfit;
@@ -11,7 +12,7 @@ type Props = {
 };
 
 const OutfitThumbnail = ({ outfit, width, height, onPress }: Props) => (
-  <TouchableOpacity
+  <PressableFade
     style={[
       styles.container,
       {
@@ -24,7 +25,7 @@ const OutfitThumbnail = ({ outfit, width, height, onPress }: Props) => (
     <View style={styles.card}>
       <Image source={{ uri: outfit.imageUri }} style={styles.image} resizeMode="cover" />
     </View>
-  </TouchableOpacity>
+  </PressableFade>
 );
 
 const styles = StyleSheet.create({

@@ -1,12 +1,13 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
+import PressableFade from "./PressableFade";
 
 const AddButton = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity style={styles.button} onPress={onPress}>
+  <PressableFade style={styles.button} onPress={onPress}>
     <MaterialIcons name="add" size={24} color={colors.icon_stroke} />
-  </TouchableOpacity>
+  </PressableFade>
 );
 
 const styles = StyleSheet.create({
