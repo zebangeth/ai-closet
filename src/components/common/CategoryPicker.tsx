@@ -1,9 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList, Pressable } from "react-native";
-import { categories } from "../../data/categories";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { categories } from "../../data/categories";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
+
+const MODAL = {
+  HEADER_HEIGHT: 56,
+  HEIGHT_PERCENTAGE: "50%" as const,
+  BORDER_RADIUS: 20,
+};
+
+const SPACING = {
+  HORIZONTAL: 16,
+  VERTICAL: 16,
+  ICON: 12,
+  TEXT: 8,
+};
+
+const FONT_SIZE = {
+  HEADER: 18,
+  REGULAR: 16,
+};
+
+const ICON = {
+  SIZE: 30,
+  CATEGORY_SIZE: 24,
+};
 
 type Props = {
   selectedCategory: string;
@@ -77,7 +100,7 @@ const CategoryPicker = ({
                   >
                     <MaterialCommunityIcons
                       name={categoryIcons[item as CategoryKey]}
-                      size={24}
+                      size={ICON.CATEGORY_SIZE}
                       color={tempCategory === item ? colors.text_primary : colors.text_gray}
                       style={styles.icon}
                     />
@@ -118,7 +141,7 @@ const CategoryPicker = ({
           <Text style={styles.inlineValue}>
             {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : "Select Category"}
           </Text>
-          <MaterialCommunityIcons name="chevron-right" size={30} color={colors.text_gray} />
+          <MaterialCommunityIcons name="chevron-right" size={ICON.SIZE} color={colors.text_gray} />
         </TouchableOpacity>
         {renderModal()}
       </View>
@@ -131,7 +154,7 @@ const CategoryPicker = ({
         <Text style={styles.inputText}>
           {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : "Select Category"}
         </Text>
-        <MaterialCommunityIcons name="chevron-down" size={30} color={colors.text_gray} />
+        <MaterialCommunityIcons name="chevron-down" size={ICON.SIZE} color={colors.text_gray} />
       </TouchableOpacity>
       {renderModal()}
     </View>
@@ -146,14 +169,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
-    paddingRight: 16,
+    paddingRight: SPACING.HORIZONTAL,
     flex: 1,
   },
   inlineValue: {
-    fontSize: 16,
+    fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.regular,
     color: colors.text_gray,
-    marginRight: 8,
+    marginRight: SPACING.TEXT,
   },
   inputField: {
     flexDirection: "row",
@@ -162,11 +185,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border_gray,
     borderRadius: 8,
-    padding: 12,
+    padding: SPACING.VERTICAL,
     backgroundColor: colors.screen_background,
   },
   inputText: {
-    fontSize: 16,
+    fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.regular,
     color: colors.text_primary,
     flex: 1,
@@ -178,28 +201,28 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: colors.screen_background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: "50%",
+    borderTopLeftRadius: MODAL.BORDER_RADIUS,
+    borderTopRightRadius: MODAL.BORDER_RADIUS,
+    height: MODAL.HEIGHT_PERCENTAGE,
     overflow: "hidden",
   },
   headerBar: {
-    height: 56,
+    height: MODAL.HEADER_HEIGHT,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.HORIZONTAL,
     borderBottomWidth: 1,
     borderColor: colors.divider_light,
     backgroundColor: colors.screen_background,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: FONT_SIZE.HEADER,
     fontFamily: typography.bold,
     color: colors.text_primary,
   },
   headerButton: {
-    fontSize: 16,
+    fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.medium,
     color: colors.text_gray,
   },
@@ -220,13 +243,13 @@ const styles = StyleSheet.create({
   pickerItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
+    padding: SPACING.HORIZONTAL,
   },
   pickerItemSelected: {
     backgroundColor: colors.light_yellow,
   },
   pickerItemText: {
-    fontSize: 16,
+    fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.regular,
     color: colors.text_gray,
   },
@@ -235,7 +258,7 @@ const styles = StyleSheet.create({
     color: colors.text_primary,
   },
   icon: {
-    marginRight: 12,
+    marginRight: SPACING.ICON,
   },
 });
 

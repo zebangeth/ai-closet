@@ -27,7 +27,37 @@ import { colors as colorOptions, seasons, occasions } from "../data/options";
 import { brands as brandSuggestions } from "../data/suggestions";
 import { typography } from "../styles/globalStyles";
 
-// Accept both stack and modal navigation props
+// Style Constants
+const SPACING = {
+  VERTICAL: 16,
+  HORIZONTAL: 16,
+  SECTION: 12,
+  SMALL: 8,
+  TINY: 4,
+};
+
+const FONT_SIZE = {
+  SECTION_TITLE: 18,
+  REGULAR: 16,
+};
+
+const CONTAINER = {
+  BOTTOM_BUTTON: 20,
+  MIN_INPUT_HEIGHT: 24,
+  BORDER_RADIUS: {
+    SMALL: 8,
+    MEDIUM: 12,
+  },
+  SCROLL_BOTTOM_PADDING: 100,
+  ICON_SIZE: 30,
+};
+
+const FLEX = {
+  LABEL: 1,
+  VALUE: 2,
+};
+
+// Types
 type Props = ClosetStackScreenProps<"ClothingDetail"> | RootStackScreenProps<"ClothingDetailModal">;
 
 // DetailField component for text input fields
@@ -66,7 +96,7 @@ const DetailField = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        <MaterialCommunityIcons name="chevron-right" size={30} color={colors.text_gray} />
+        <MaterialCommunityIcons name="chevron-right" size={CONTAINER.ICON_SIZE} color={colors.text_gray} />
       </TouchableOpacity>
     </View>
   );
@@ -305,7 +335,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.screen_background,
   },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: CONTAINER.SCROLL_BOTTOM_PADDING,
   },
   image: {
     width: "100%",
@@ -313,67 +343,67 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F8",
   },
   section: {
-    paddingVertical: 16,
+    paddingVertical: SPACING.VERTICAL,
   },
   sectionTitle: {
     fontFamily: typography.bold,
-    fontSize: 18,
+    fontSize: FONT_SIZE.SECTION_TITLE,
     color: colors.text_primary,
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    paddingHorizontal: SPACING.HORIZONTAL,
+    marginBottom: SPACING.SECTION,
   },
   detailRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 16,
-    paddingLeft: 16,
+    paddingVertical: SPACING.VERTICAL,
+    paddingLeft: SPACING.HORIZONTAL,
   },
   detailLabel: {
-    fontSize: 16,
+    fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.medium,
     color: colors.text_primary,
-    flex: 2,
+    flex: FLEX.LABEL,
   },
   valueContainer: {
-    flex: 3,
+    flex: FLEX.VALUE,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
-    paddingRight: 16,
-    minHeight: 24,
+    paddingRight: SPACING.HORIZONTAL,
+    minHeight: CONTAINER.MIN_INPUT_HEIGHT,
   },
   valueContainerFocused: {
     backgroundColor: colors.thumbnail_background,
-    marginVertical: -8,
-    paddingVertical: 8,
-    marginRight: 16,
-    paddingRight: -8,
-    borderRadius: 8,
+    marginVertical: -SPACING.SMALL,
+    paddingVertical: SPACING.SMALL,
+    marginRight: SPACING.HORIZONTAL,
+    paddingRight: -SPACING.SMALL,
+    borderRadius: CONTAINER.BORDER_RADIUS.SMALL,
   },
   detailValue: {
     flex: 1,
-    fontSize: 16,
+    fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.regular,
     color: colors.text_gray,
     textAlign: "right",
-    marginRight: 8,
+    marginRight: SPACING.SMALL,
   },
   multiSelectContainer: {
-    flex: 3,
+    flex: FLEX.VALUE,
     alignItems: "flex-end",
   },
   saveButton: {
     position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: CONTAINER.BOTTOM_BUTTON,
+    left: CONTAINER.BOTTOM_BUTTON,
+    right: CONTAINER.BOTTOM_BUTTON,
     backgroundColor: colors.primary_yellow,
-    padding: 16,
-    borderRadius: 12,
+    padding: SPACING.HORIZONTAL,
+    borderRadius: CONTAINER.BORDER_RADIUS.MEDIUM,
     alignItems: "center",
   },
   saveButtonText: {
-    fontSize: 16,
+    fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.bold,
     color: colors.text_primary,
   },
