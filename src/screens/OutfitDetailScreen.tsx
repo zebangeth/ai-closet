@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
@@ -15,6 +15,7 @@ import { seasons, occasions } from "../data/options";
 import { MaterialIcons } from "@expo/vector-icons";
 import ClothingItemThumbnail from "../components/clothing/ClothingItemThumbnail";
 import { ClothingContext } from "../contexts/ClothingContext";
+import PressableFade from "../components/common/PressableFade";
 
 type Props = OutfitStackScreenProps<"OutfitDetail">;
 
@@ -125,12 +126,16 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
         {/* Main outfit image section */}
         <View style={styles.imageContainer}>
           <Image source={{ uri: localOutfit.imageUri }} style={styles.image} resizeMode="contain" />
-          <TouchableOpacity style={styles.editButton} onPress={handleEditOutfit}>
+          <PressableFade
+            containerStyle={styles.editButtonContainer}
+            style={styles.editButton}
+            onPress={handleEditOutfit}
+          >
             <View style={styles.editButtonContent}>
               <MaterialIcons name="edit" size={20} color={colors.text_primary} />
               <Text style={styles.editButtonText}>Edit Outfit</Text>
             </View>
-          </TouchableOpacity>
+          </PressableFade>
         </View>
 
         {/* Tags section */}
@@ -190,9 +195,9 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
       </ScrollView>
 
       {isDirty && (
-        <Pressable style={styles.saveButton} onPress={handleSave}>
+        <PressableFade containerStyle={styles.saveButtonContainer} style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save</Text>
-        </Pressable>
+        </PressableFade>
       )}
     </SafeAreaView>
   );
@@ -216,10 +221,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  editButton: {
+  editButtonContainer: {
     position: "absolute",
     bottom: 16,
     right: 16,
+  },
+  editButton: {
     backgroundColor: colors.primary_yellow,
     borderRadius: 8,
     shadowColor: "#000",
@@ -269,11 +276,13 @@ const styles = StyleSheet.create({
   itemThumbnail: {
     width: 120,
   },
-  saveButton: {
+  saveButtonContainer: {
     position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
+  },
+  saveButton: {
     backgroundColor: colors.primary_yellow,
     padding: 16,
     borderRadius: 12,

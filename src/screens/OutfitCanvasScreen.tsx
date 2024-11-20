@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import ViewShot, { CaptureOptions } from "react-native-view-shot";
@@ -12,6 +12,7 @@ import { ClothingContext } from "../contexts/ClothingContext";
 import { OutfitContext } from "../contexts/OutfitContext";
 import { ClothingItem } from "../types/ClothingItem";
 import { Outfit, OutfitItem } from "../types/Outfit";
+import PressableFade from "../components/common/PressableFade";
 import { v4 as uuidv4 } from "uuid";
 
 const ITEM_SIZE = 150;
@@ -186,13 +187,22 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     >
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+        <PressableFade
+          containerStyle={styles.headerButtonContainer}
+          style={styles.headerButton}
+          onPress={() => navigation.goBack()}
+        >
           <MaterialIcons name="arrow-back" size={24} color={colors.icon_stroke} />
-        </TouchableOpacity>
+        </PressableFade>
         <Text style={styles.title}>Outfit Canvas</Text>
-        <TouchableOpacity onPress={handleSave} disabled={isSaving} style={styles.headerButton}>
+        <PressableFade
+          containerStyle={styles.headerButtonContainer}
+          style={styles.headerButton}
+          onPress={handleSave}
+          disabled={isSaving}
+        >
           <MaterialIcons name="save" size={24} color={isSaving ? colors.text_gray : colors.icon_stroke} />
-        </TouchableOpacity>
+        </PressableFade>
       </View>
 
       {/* Canvas Area */}
@@ -220,20 +230,22 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
 
       {/* Bottom Buttons */}
       <View style={styles.bottomButtons}>
-        <TouchableOpacity
+        <PressableFade
+          containerStyle={styles.buttonContainer}
           style={[styles.button, isSaving && styles.buttonDisabled]}
           onPress={() => setIsAddItemsVisible(true)}
           disabled={isSaving}
         >
           <Text style={styles.buttonText}>Add Items</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </PressableFade>
+        <PressableFade
+          containerStyle={styles.buttonContainer}
           style={[styles.button, isSaving && styles.buttonDisabled]}
           onPress={handleSave}
           disabled={isSaving}
         >
           <Text style={styles.buttonText}>Save Outfit</Text>
-        </TouchableOpacity>
+        </PressableFade>
       </View>
 
       {/* Add Items Overlay */}
@@ -259,8 +271,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.divider_light,
   },
-  headerButton: {
+  headerButtonContainer: {
     padding: 8,
+  },
+  headerButton: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 20,
@@ -281,8 +297,10 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
-  button: {
+  buttonContainer: {
     flex: 1,
+  },
+  button: {
     backgroundColor: colors.primary_yellow,
     padding: 16,
     borderRadius: 12,

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert, Image } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
+import PressableFade from "../components/common/PressableFade";
 import TryOnOptionSheet from "../components/virtualTryOn/TryOnOptionSheet";
 import ContentSelectionBox from "../components/virtualTryOn/ContentSelectionBox";
 import PhotoTipsSection from "../components/virtualTryOn/PhotoTipsSection";
@@ -169,13 +170,14 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
           <TryOnProgress progress={progress} />
         ) : (
           !resultImageUri && (
-            <TouchableOpacity
+            <PressableFade
+              containerStyle={styles.tryOnButtonContainer}
               style={[styles.tryOnButton, (!selectedOutfitUri || !selectedPhotoUri) && styles.tryOnButtonDisabled]}
               onPress={handleTryOn}
               disabled={!selectedOutfitUri || !selectedPhotoUri}
             >
               <Text style={styles.tryOnButtonText}>Try It On!</Text>
-            </TouchableOpacity>
+            </PressableFade>
           )
         )}
 
@@ -184,7 +186,8 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
           <View style={styles.resultContainer}>
             <Text style={styles.subtitle}>Here's how it looks on you!</Text>
             <Image source={{ uri: resultImageUri }} style={styles.resultImage} resizeMode="contain" />
-            <TouchableOpacity
+            <PressableFade
+              containerStyle={styles.regenerateButtonContainer}
               style={styles.regenerateButton}
               onPress={() => {
                 setResultImageUri(undefined);
@@ -192,7 +195,7 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
               }}
             >
               <Text style={styles.regenerateButtonText}>Re-generate</Text>
-            </TouchableOpacity>
+            </PressableFade>
           </View>
         )}
 
@@ -239,12 +242,14 @@ const styles = StyleSheet.create({
     marginHorizontal: -6,
     marginBottom: 24,
   },
+  tryOnButtonContainer: {
+    marginBottom: 24,
+  },
   tryOnButton: {
     backgroundColor: colors.primary_yellow,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
-    marginBottom: 24,
   },
   tryOnButtonDisabled: {
     opacity: 0.5,
@@ -269,6 +274,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     backgroundColor: colors.thumbnail_background,
+  },
+  regenerateButtonContainer: {
+    width: "100%",
   },
   regenerateButton: {
     backgroundColor: colors.thumbnail_background,
