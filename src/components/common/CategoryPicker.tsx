@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList, Pressable } from "react-native";
+import { View, Text, Modal, StyleSheet, FlatList, Pressable } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { categories } from "../../data/categories";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
+import PressableFade from "./PressableFade";
 
 const MODAL = {
   HEADER_HEIGHT: 56,
@@ -32,7 +33,6 @@ type Props = {
   selectedCategory: string;
   selectedSubcategory: string;
   onValueChange: (category: string, subcategory: string) => void;
-  presentationType?: "default" | "inline";
 };
 
 type CategoryKey = keyof typeof categories;
@@ -47,12 +47,7 @@ const categoryIcons: { [key in CategoryKey]: React.ComponentProps<typeof Materia
   Jewelry: "diamond-stone",
 };
 
-const CategoryPicker = ({
-  selectedCategory,
-  selectedSubcategory,
-  onValueChange,
-  presentationType = "default",
-}: Props) => {
+const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [tempCategory, setTempCategory] = useState<CategoryKey>((selectedCategory as CategoryKey) || "");
   const [tempSubcategory, setTempSubcategory] = useState(selectedSubcategory || "");
@@ -79,13 +74,13 @@ const CategoryPicker = ({
       <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.headerBar}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.headerButton}>Cancel</Text>
-            </TouchableOpacity>
+            <PressableFade onPress={() => setModalVisible(false)} style={styles.headerButton}>
+              <Text style={styles.headerButtonText}>Cancel</Text>
+            </PressableFade>
             <Text style={styles.headerTitle}>Select Category</Text>
-            <TouchableOpacity onPress={handleConfirm}>
-              <Text style={[styles.headerButton, { color: colors.primary_yellow }]}>Done</Text>
-            </TouchableOpacity>
+            <PressableFade onPress={handleConfirm} style={styles.headerButton}>
+              <Text style={[styles.headerButtonText, { color: colors.primary_yellow }]}>Done</Text>
+            </PressableFade>
           </View>
 
           <View style={styles.pickerContent}>
@@ -94,7 +89,7 @@ const CategoryPicker = ({
                 data={Object.keys(categories)}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                  <TouchableOpacity
+                  <PressableFade
                     style={[styles.pickerItem, tempCategory === item && styles.pickerItemSelected]}
                     onPress={() => handleCategorySelect(item as CategoryKey)}
                   >
@@ -107,7 +102,7 @@ const CategoryPicker = ({
                     <Text style={[styles.pickerItemText, tempCategory === item && styles.pickerItemTextSelected]}>
                       {item}
                     </Text>
-                  </TouchableOpacity>
+                  </PressableFade>
                 )}
               />
             </View>
@@ -117,14 +112,14 @@ const CategoryPicker = ({
                 data={categories[tempCategory]}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                  <TouchableOpacity
+                  <PressableFade
                     style={[styles.pickerItem, tempSubcategory === item && styles.pickerItemSelected]}
                     onPress={() => setTempSubcategory(item)}
                   >
                     <Text style={[styles.pickerItemText, tempSubcategory === item && styles.pickerItemTextSelected]}>
                       {item}
                     </Text>
-                  </TouchableOpacity>
+                  </PressableFade>
                 )}
               />
             </View>
@@ -134,64 +129,39 @@ const CategoryPicker = ({
     </Modal>
   );
 
-  if (presentationType === "inline") {
-    return (
-      <View style={styles.inlineContainer}>
-        <TouchableOpacity style={styles.inlineValueContainer} onPress={() => setModalVisible(true)}>
-          <Text style={styles.inlineValue}>
+  return (
+    <View style={styles.container}>
+      <PressableFade style={styles.pressableContainer} onPress={() => setModalVisible(true)}>
+        <View style={styles.valueContainer}>
+          <Text style={styles.value} numberOfLines={1}>
             {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : "Select Category"}
           </Text>
           <MaterialCommunityIcons name="chevron-right" size={ICON.SIZE} color={colors.text_gray} />
-        </TouchableOpacity>
-        {renderModal()}
-      </View>
-    );
-  }
-
-  return (
-    <View>
-      <TouchableOpacity style={styles.inputField} onPress={() => setModalVisible(true)}>
-        <Text style={styles.inputText}>
-          {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : "Select Category"}
-        </Text>
-        <MaterialCommunityIcons name="chevron-down" size={ICON.SIZE} color={colors.text_gray} />
-      </TouchableOpacity>
+        </View>
+      </PressableFade>
       {renderModal()}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  inlineContainer: {
+  container: {
     flex: 1,
   },
-  inlineValueContainer: {
+  pressableContainer: {
+    flex: 1,
+  },
+  valueContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
     paddingRight: SPACING.HORIZONTAL,
-    flex: 1,
   },
-  inlineValue: {
+  value: {
     fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.regular,
     color: colors.text_gray,
     marginRight: SPACING.TEXT,
-  },
-  inputField: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: colors.border_gray,
-    borderRadius: 8,
-    padding: SPACING.VERTICAL,
-    backgroundColor: colors.screen_background,
-  },
-  inputText: {
-    fontSize: FONT_SIZE.REGULAR,
-    fontFamily: typography.regular,
-    color: colors.text_primary,
+    textAlign: "right",
     flex: 1,
   },
   modalOverlay: {
@@ -222,6 +192,9 @@ const styles = StyleSheet.create({
     color: colors.text_primary,
   },
   headerButton: {
+    padding: SPACING.TEXT,
+  },
+  headerButtonText: {
     fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.medium,
     color: colors.text_gray,

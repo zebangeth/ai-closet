@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, Modal, TouchableOpacity, StyleSheet, FlatList, Pressable } from "react-native";
+import { View, Text, Modal, StyleSheet, FlatList, Pressable } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
+import PressableFade from "./PressableFade";
 
-// Style Constants
 const MODAL = {
   HEADER_HEIGHT: 56,
   HEIGHT_PERCENTAGE: "50%" as const,
@@ -33,7 +33,6 @@ const PICKER_ITEM = {
 type Props = {
   selectedDate: string; // Format: 'YYYY-MM'
   onValueChange: (date: string) => void;
-  presentationType?: "default" | "inline";
 };
 
 const months = [
@@ -53,7 +52,7 @@ const months = [
 
 const monthAbbreviations = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-const YearMonthPicker = ({ selectedDate, onValueChange, presentationType = "default" }: Props) => {
+const YearMonthPicker = ({ selectedDate, onValueChange }: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [tempMonth, setTempMonth] = useState<number>(
     selectedDate ? parseInt(selectedDate.split("-")[1]) - 1 : new Date().getMonth()
@@ -69,12 +68,11 @@ const YearMonthPicker = ({ selectedDate, onValueChange, presentationType = "defa
     setModalVisible(false);
   };
 
-  const formatDisplayDate = (dateString: string, useAbbreviation: boolean = false) => {
+  const formatDisplayDate = (dateString: string) => {
     if (!dateString) return "Select Date";
     const [year, month] = dateString.split("-");
     const monthIndex = parseInt(month) - 1;
-    const monthDisplay = useAbbreviation ? monthAbbreviations[monthIndex] : months[monthIndex];
-    return `${monthDisplay} ${year}`;
+    return `${monthAbbreviations[monthIndex]} ${year}`;
   };
 
   const years: number[] = Array.from(
@@ -92,13 +90,13 @@ const YearMonthPicker = ({ selectedDate, onValueChange, presentationType = "defa
       <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.headerBar}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.headerButton}>Cancel</Text>
-            </TouchableOpacity>
+            <PressableFade onPress={() => setModalVisible(false)} style={styles.headerButton}>
+              <Text style={styles.headerButtonText}>Cancel</Text>
+            </PressableFade>
             <Text style={styles.headerTitle}>Select Purchase Date</Text>
-            <TouchableOpacity onPress={handleConfirm}>
-              <Text style={[styles.headerButton, { color: colors.primary_yellow }]}>Done</Text>
-            </TouchableOpacity>
+            <PressableFade onPress={handleConfirm} style={styles.headerButton}>
+              <Text style={[styles.headerButtonText, { color: colors.primary_yellow }]}>Done</Text>
+            </PressableFade>
           </View>
 
           <View style={styles.pickerContent}>
@@ -113,14 +111,14 @@ const YearMonthPicker = ({ selectedDate, onValueChange, presentationType = "defa
                   index,
                 })}
                 renderItem={({ item, index }) => (
-                  <TouchableOpacity
+                  <PressableFade
                     style={[styles.pickerItem, tempMonth === index && styles.pickerItemSelected]}
                     onPress={() => setTempMonth(index)}
                   >
                     <Text style={[styles.pickerItemText, tempMonth === index && styles.pickerItemTextSelected]}>
                       {item}
                     </Text>
-                  </TouchableOpacity>
+                  </PressableFade>
                 )}
               />
             </View>
@@ -136,14 +134,14 @@ const YearMonthPicker = ({ selectedDate, onValueChange, presentationType = "defa
                   index,
                 })}
                 renderItem={({ item }) => (
-                  <TouchableOpacity
+                  <PressableFade
                     style={[styles.pickerItem, tempYear === item && styles.pickerItemSelected]}
                     onPress={() => setTempYear(item)}
                   >
                     <Text style={[styles.pickerItemText, tempYear === item && styles.pickerItemTextSelected]}>
                       {item.toString()}
                     </Text>
-                  </TouchableOpacity>
+                  </PressableFade>
                 )}
               />
             </View>
@@ -153,60 +151,39 @@ const YearMonthPicker = ({ selectedDate, onValueChange, presentationType = "defa
     </Modal>
   );
 
-  if (presentationType === "inline") {
-    return (
-      <View style={styles.inlineContainer}>
-        <TouchableOpacity style={styles.inlineValueContainer} onPress={() => setModalVisible(true)} activeOpacity={0.7}>
-          <Text style={styles.inlineValue}>{formatDisplayDate(selectedDate, true)}</Text>
-          <MaterialCommunityIcons name="chevron-right" size={ICON.SIZE} color={colors.text_gray} />
-        </TouchableOpacity>
-        {renderModal()}
-      </View>
-    );
-  }
-
   return (
-    <View>
-      <TouchableOpacity style={styles.inputField} onPress={() => setModalVisible(true)}>
-        <Text style={styles.inputText}>{formatDisplayDate(selectedDate)}</Text>
-        <MaterialCommunityIcons name="chevron-down" size={ICON.SIZE} color={colors.text_gray} />
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <PressableFade style={styles.pressableContainer} onPress={() => setModalVisible(true)}>
+        <View style={styles.valueContainer}>
+          <Text style={styles.value} numberOfLines={1}>
+            {formatDisplayDate(selectedDate)}
+          </Text>
+          <MaterialCommunityIcons name="chevron-right" size={ICON.SIZE} color={colors.text_gray} />
+        </View>
+      </PressableFade>
       {renderModal()}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  inlineContainer: {
+  container: {
     flex: 1,
   },
-  inlineValueContainer: {
+  pressableContainer: {
+    flex: 1,
+  },
+  valueContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
     paddingRight: SPACING.HORIZONTAL,
-    flex: 1,
   },
-  inlineValue: {
+  value: {
     fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.regular,
     color: colors.text_gray,
     marginRight: SPACING.TEXT,
-  },
-  inputField: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: colors.border_gray,
-    borderRadius: 8,
-    padding: SPACING.VERTICAL,
-    backgroundColor: colors.screen_background,
-  },
-  inputText: {
-    fontSize: FONT_SIZE.REGULAR,
-    fontFamily: typography.regular,
-    color: colors.text_primary,
+    textAlign: "right",
     flex: 1,
   },
   modalOverlay: {
@@ -237,6 +214,9 @@ const styles = StyleSheet.create({
     color: colors.text_primary,
   },
   headerButton: {
+    padding: SPACING.TEXT,
+  },
+  headerButtonText: {
     fontSize: FONT_SIZE.REGULAR,
     fontFamily: typography.medium,
     color: colors.text_gray,

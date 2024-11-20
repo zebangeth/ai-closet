@@ -10,7 +10,6 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -80,10 +79,9 @@ const DetailField = ({
   return (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
-      <TouchableOpacity
+      <Pressable
         style={[styles.valueContainer, isFocused && styles.valueContainerFocused]}
         onPress={() => inputRef.current?.focus()}
-        activeOpacity={0.7}
       >
         <TextInput
           ref={inputRef}
@@ -97,7 +95,7 @@ const DetailField = ({
           onBlur={() => setIsFocused(false)}
         />
         <MaterialCommunityIcons name="chevron-right" size={CONTAINER.ICON_SIZE} color={colors.text_gray} />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };
@@ -254,7 +252,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                   handleFieldChange("category", category);
                   handleFieldChange("subcategory", subcategory);
                 }}
-                presentationType="inline"
               />
             </View>
 
@@ -301,7 +298,6 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               <YearMonthPicker
                 selectedDate={localItem.purchaseDate}
                 onValueChange={(date) => handleFieldChange("purchaseDate", date)}
-                presentationType="inline"
               />
             </View>
 
