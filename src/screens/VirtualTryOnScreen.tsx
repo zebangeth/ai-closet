@@ -52,50 +52,43 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
     }
   }, [isProcessing]);
 
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission Required", "Permission to access gallery is required!");
+      return null;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: false,
+      aspect: [3, 4],
+      quality: 1,
+    });
+
+    return !result.canceled ? result.assets[0].uri : null;
+  };
+
   const handleOptionSelect = async (optionId: string) => {
     setOptionSheetVisible(false);
 
     // Add slight delay before showing picker to ensure smooth animation
     setTimeout(async () => {
       if (optionId === "discover") {
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (!permissionResult.granted) {
-          Alert.alert("Permission Required", "Permission to access gallery is required!");
-          return;
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: false,
-          aspect: [3, 4],
-          quality: 1,
-        });
-
-        if (!result.canceled) {
-          setSelectedOutfitUri(result.assets[0].uri);
-          setResultImageUri(undefined); // Clear previous result when new outfit is selected
+        const uri = await pickImage();
+        if (uri) {
+          setSelectedOutfitUri(uri);
+          setResultImageUri(undefined);
         }
       }
-    }, 300); // Wait for sheet close animation
+    }, 300);
   };
 
   const handlePhotoSelect = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert("Permission Required", "Permission to access gallery is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [3, 4],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setSelectedPhotoUri(result.assets[0].uri);
-      setResultImageUri(undefined); // Clear previous result when new photo is selected
+    const uri = await pickImage();
+    if (uri) {
+      setSelectedPhotoUri(uri);
+      setResultImageUri(undefined);
     }
   };
 
@@ -120,7 +113,7 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
 
       // Save to try-on history
       await addTryOn({
-        tryOnType: "discover", // Since we're currently only supporting the discover option
+        tryOnType: "discover",
         newClothingImageUri: selectedOutfitUri,
         userPhotoUri: selectedPhotoUri,
         resultImageUri: response.resultImageUri,
