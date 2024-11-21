@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  Image,
   Pressable,
   StyleSheet,
   Alert,
@@ -17,6 +16,7 @@ import { ClothingContext } from "../contexts/ClothingContext";
 import { ClosetStackScreenProps, RootStackScreenProps } from "../types/navigation";
 import { ClothingItem } from "../types/ClothingItem";
 import { colors } from "../styles/colors";
+import LoadingImageView from "../components/common/LoadingImageView";
 import TagChips from "../components/common/TagChips";
 import Header from "../components/common/Header";
 import CategoryPicker from "../components/common/CategoryPicker";
@@ -66,12 +66,14 @@ const DetailField = ({
   onChangeText,
   keyboardType = "default",
   placeholder = "",
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
   keyboardType?: "default" | "numeric";
   placeholder?: string;
+  disabled?: boolean;
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
@@ -82,10 +84,11 @@ const DetailField = ({
       <Pressable
         style={[styles.valueContainer, isFocused && styles.valueContainerFocused]}
         onPress={() => inputRef.current?.focus()}
+        disabled={disabled}
       >
         <TextInput
           ref={inputRef}
-          style={styles.detailValue}
+          style={[styles.detailValue, disabled && styles.detailValueDisabled]}
           value={value}
           onChangeText={onChangeText}
           keyboardType={keyboardType}
@@ -93,6 +96,7 @@ const DetailField = ({
           placeholderTextColor={colors.text_gray}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          editable={!disabled}
         />
         <MaterialCommunityIcons name="chevron-right" size={CONTAINER.ICON_SIZE} color={colors.text_gray} />
       </Pressable>
@@ -106,16 +110,23 @@ const MultiSelectField = ({
   selectedValues,
   options,
   onValueChange,
+  disabled = false,
 }: {
   label: string;
   selectedValues: string[];
   options: string[];
   onValueChange: (values: string[]) => void;
+  disabled?: boolean;
 }) => (
   <View style={styles.detailRow}>
     <Text style={styles.detailLabel}>{label}</Text>
     <View style={styles.multiSelectContainer}>
-      <MultiSelectToggle options={options} selectedValues={selectedValues} onValueChange={onValueChange} />
+      <MultiSelectToggle
+        options={options}
+        selectedValues={selectedValues}
+        onValueChange={onValueChange}
+        disabled={disabled}
+      />
     </View>
   </View>
 );
@@ -140,7 +151,42 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
   const [localItem, setLocalItem] = useState<ClothingItem | undefined>(contextItem);
   const [isDirty, setIsDirty] = useState(false);
 
-  // Update local state when context item changes
+  // Get the processing status
+  const isProcessing =
+    localItem?.processingStatus.backgroundRemoval === "processing" ||
+    localItem?.processingStatus.categorization === "processing";
+
+  // Function to get loading text based on processing status
+  const getLoadingText = (item: ClothingItem): string | undefined => {
+    if (item.processingStatus.backgroundRemoval === "processing") {
+      return "Removing background...";
+    }
+    if (item.processingStatus.categorization === "processing") {
+      return "Analyzing item details...";
+    }
+    return undefined;
+  };
+
+  // Update local state when context item changes (e.g., when processing completes)
+  useEffect(() => {
+    if (contextItem && localItem) {
+      const prevStatus = localItem.processingStatus;
+      const newStatus = contextItem.processingStatus;
+
+      // Check if categorization just completed
+      if (prevStatus.categorization !== "completed" && newStatus.categorization === "completed") {
+        // Update local state with new categorization data
+        setLocalItem(contextItem);
+        setIsDirty(false);
+      }
+
+      // Update local item if background removal completed
+      if (prevStatus.backgroundRemoval !== "completed" && newStatus.backgroundRemoval === "completed") {
+        setLocalItem(contextItem);
+      }
+    }
+  }, [contextItem]);
+
   useEffect(() => {
     if (contextItem) {
       setLocalItem(contextItem);
@@ -178,6 +224,8 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
   };
 
   const handleFieldChange = (field: keyof ClothingItem, value: any) => {
+    if (isProcessing) return; // Prevent changes while processing
+
     setLocalItem((prevItem) => {
       if (!prevItem) return prevItem;
       return { ...prevItem, [field]: value };
@@ -216,12 +264,11 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Image
-            source={{
-              uri: localItem.backgroundRemovedImageUri || localItem.imageUri,
-            }}
-            resizeMode="contain"
-            style={styles.image}
+          <LoadingImageView
+            imageUri={localItem.imageUri}
+            processedImageUri={localItem.backgroundRemovedImageUri}
+            isLoading={isProcessing}
+            loadingText={getLoadingText(localItem)}
           />
 
           <View style={styles.section}>
@@ -252,6 +299,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                   handleFieldChange("category", category);
                   handleFieldChange("subcategory", subcategory);
                 }}
+                disabled={isProcessing}
               />
             </View>
 
@@ -266,6 +314,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
                 )
               }
               placeholder="Enter color(s)"
+              disabled={isProcessing}
             />
 
             {/* Season */}
@@ -274,6 +323,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               selectedValues={localItem.season}
               options={seasons}
               onValueChange={(selectedSeasons) => handleFieldChange("season", selectedSeasons)}
+              disabled={isProcessing}
             />
 
             {/* Occasion */}
@@ -282,6 +332,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               selectedValues={localItem.occasion}
               options={occasions}
               onValueChange={(selectedOccasions) => handleFieldChange("occasion", selectedOccasions)}
+              disabled={isProcessing}
             />
 
             {/* Brand */}
@@ -290,6 +341,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               value={localItem.brand}
               onChangeText={(text) => handleFieldChange("brand", text)}
               placeholder="Enter brand"
+              disabled={isProcessing}
             />
 
             {/* Purchase Date */}
@@ -298,6 +350,7 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               <YearMonthPicker
                 selectedDate={localItem.purchaseDate}
                 onValueChange={(date) => handleFieldChange("purchaseDate", date)}
+                disabled={isProcessing}
               />
             </View>
 
@@ -311,12 +364,13 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               }}
               keyboardType="numeric"
               placeholder="Enter price"
+              disabled={isProcessing}
             />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {isDirty && (
+      {isDirty && !isProcessing && (
         <Pressable style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save</Text>
         </Pressable>
@@ -332,11 +386,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: CONTAINER.SCROLL_BOTTOM_PADDING,
-  },
-  image: {
-    width: "100%",
-    aspectRatio: 1,
-    backgroundColor: "#F8F8F8",
   },
   section: {
     paddingVertical: SPACING.VERTICAL,
@@ -383,6 +432,9 @@ const styles = StyleSheet.create({
     color: colors.text_gray,
     textAlign: "right",
     marginRight: SPACING.SMALL,
+  },
+  detailValueDisabled: {
+    opacity: 0.5,
   },
   multiSelectContainer: {
     flex: FLEX.VALUE,

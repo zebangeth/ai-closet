@@ -33,6 +33,7 @@ type Props = {
   selectedCategory: string;
   selectedSubcategory: string;
   onValueChange: (category: string, subcategory: string) => void;
+  disabled?: boolean;
 };
 
 type CategoryKey = keyof typeof categories;
@@ -47,7 +48,7 @@ const categoryIcons: { [key in CategoryKey]: React.ComponentProps<typeof Materia
   Jewelry: "diamond-stone",
 };
 
-const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }: Props) => {
+const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange, disabled = false }: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [tempCategory, setTempCategory] = useState<CategoryKey>((selectedCategory as CategoryKey) || "");
   const [tempSubcategory, setTempSubcategory] = useState(selectedSubcategory || "");
@@ -131,12 +132,20 @@ const CategoryPicker = ({ selectedCategory, selectedSubcategory, onValueChange }
 
   return (
     <View style={styles.container}>
-      <PressableFade style={styles.pressableContainer} onPress={() => setModalVisible(true)}>
+      <PressableFade
+        style={[styles.pressableContainer, disabled && styles.pressableContainerDisabled]}
+        onPress={() => !disabled && setModalVisible(true)}
+        disabled={disabled}
+      >
         <View style={styles.valueContainer}>
-          <Text style={styles.value} numberOfLines={1}>
+          <Text style={[styles.value, disabled && styles.valueDisabled]} numberOfLines={1}>
             {selectedCategory ? `${selectedCategory} - ${selectedSubcategory}` : "Select Category"}
           </Text>
-          <MaterialCommunityIcons name="chevron-right" size={ICON.SIZE} color={colors.text_gray} />
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={ICON.SIZE}
+            color={disabled ? colors.text_gray_light : colors.text_gray}
+          />
         </View>
       </PressableFade>
       {renderModal()}
@@ -151,6 +160,9 @@ const styles = StyleSheet.create({
   pressableContainer: {
     flex: 1,
   },
+  pressableContainerDisabled: {
+    opacity: 0.5,
+  },
   valueContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -163,6 +175,9 @@ const styles = StyleSheet.create({
     marginRight: SPACING.TEXT,
     textAlign: "right",
     flex: 1,
+  },
+  valueDisabled: {
+    color: colors.text_gray_light,
   },
   modalOverlay: {
     flex: 1,

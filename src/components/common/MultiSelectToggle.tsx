@@ -8,10 +8,13 @@ type Props = {
   options: string[];
   selectedValues: string[];
   onValueChange: (selected: string[]) => void;
+  disabled?: boolean;
 };
 
-const MultiSelectToggle = ({ options, selectedValues, onValueChange }: Props) => {
+const MultiSelectToggle = ({ options, selectedValues, onValueChange, disabled = false }: Props) => {
   const toggleValue = (value: string) => {
+    if (disabled) return;
+
     let updatedValues = [...selectedValues];
     if (updatedValues.includes(value)) {
       updatedValues = updatedValues.filter((v) => v !== value);
@@ -28,14 +31,32 @@ const MultiSelectToggle = ({ options, selectedValues, onValueChange }: Props) =>
         return (
           <PressableFade
             key={option}
-            style={[styles.button, isSelected && styles.buttonSelected]}
+            style={[
+              styles.button,
+              isSelected && styles.buttonSelected,
+              disabled && (isSelected ? styles.buttonSelectedDisabled : styles.buttonDisabled),
+            ]}
             onPress={() => toggleValue(option)}
+            disabled={disabled}
           >
             <View style={styles.buttonContent}>
               {isSelected && (
-                <MaterialIcons name="check" size={16} color={colors.tag_dark_text} style={styles.checkIcon} />
+                <MaterialIcons
+                  name="check"
+                  size={16}
+                  color={disabled ? colors.text_gray_light : colors.tag_dark_text}
+                  style={styles.checkIcon}
+                />
               )}
-              <Text style={[styles.buttonText, isSelected && styles.buttonTextSelected]}>{option}</Text>
+              <Text
+                style={[
+                  styles.buttonText,
+                  isSelected && styles.buttonTextSelected,
+                  disabled && (isSelected ? styles.buttonTextSelectedDisabled : styles.buttonTextDisabled),
+                ]}
+              >
+                {option}
+              </Text>
             </View>
           </PressableFade>
         );
@@ -57,12 +78,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tag_dark,
     borderColor: colors.tag_dark,
   },
+  buttonDisabled: {
+    borderColor: colors.border_gray_light,
+    opacity: 0.5,
+  },
+  buttonSelectedDisabled: {
+    backgroundColor: colors.tag_dark_disabled,
+    borderColor: colors.tag_dark_disabled,
+    opacity: 0.5,
+  },
   buttonText: {
     fontSize: 16,
     color: colors.tag_light_text,
   },
   buttonTextSelected: {
     color: colors.tag_dark_text,
+  },
+  buttonTextDisabled: {
+    color: colors.text_gray_light,
+  },
+  buttonTextSelectedDisabled: {
+    color: colors.tag_dark_text_disabled,
   },
   buttonContent: {
     flexDirection: "row",

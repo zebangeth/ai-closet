@@ -33,6 +33,7 @@ const PICKER_ITEM = {
 type Props = {
   selectedDate: string; // Format: 'YYYY-MM'
   onValueChange: (date: string) => void;
+  disabled?: boolean;
 };
 
 const months = [
@@ -52,7 +53,7 @@ const months = [
 
 const monthAbbreviations = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-const YearMonthPicker = ({ selectedDate, onValueChange }: Props) => {
+const YearMonthPicker = ({ selectedDate, onValueChange, disabled = false }: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [tempMonth, setTempMonth] = useState<number>(
     selectedDate ? parseInt(selectedDate.split("-")[1]) - 1 : new Date().getMonth()
@@ -153,12 +154,20 @@ const YearMonthPicker = ({ selectedDate, onValueChange }: Props) => {
 
   return (
     <View style={styles.container}>
-      <PressableFade style={styles.pressableContainer} onPress={() => setModalVisible(true)}>
+      <PressableFade
+        style={[styles.pressableContainer, disabled && styles.pressableContainerDisabled]}
+        onPress={() => !disabled && setModalVisible(true)}
+        disabled={disabled}
+      >
         <View style={styles.valueContainer}>
-          <Text style={styles.value} numberOfLines={1}>
+          <Text style={[styles.value, disabled && styles.valueDisabled]} numberOfLines={1}>
             {formatDisplayDate(selectedDate)}
           </Text>
-          <MaterialCommunityIcons name="chevron-right" size={ICON.SIZE} color={colors.text_gray} />
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={ICON.SIZE}
+            color={disabled ? colors.text_gray_light : colors.text_gray}
+          />
         </View>
       </PressableFade>
       {renderModal()}
@@ -173,6 +182,9 @@ const styles = StyleSheet.create({
   pressableContainer: {
     flex: 1,
   },
+  pressableContainerDisabled: {
+    opacity: 0.5,
+  },
   valueContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -185,6 +197,9 @@ const styles = StyleSheet.create({
     marginRight: SPACING.TEXT,
     textAlign: "right",
     flex: 1,
+  },
+  valueDisabled: {
+    color: colors.text_gray_light,
   },
   modalOverlay: {
     flex: 1,
