@@ -18,7 +18,7 @@ const LoadingImageView = ({ imageUri, processedImageUri, isLoading = false, load
 
   return (
     <View style={[styles.container, style]}>
-      <Image source={{ uri: displayImageUri }} style={styles.image} resizeMode="contain" />
+      <Image source={{ uri: displayImageUri }} style={styles.image} resizeMode={isLoading ? "cover" : "contain"} />
 
       {isLoading && (
         <Animated.View entering={FadeIn} style={StyleSheet.absoluteFill}>
