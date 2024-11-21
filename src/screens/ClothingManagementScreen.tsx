@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { View, Text, StyleSheet, FlatList, ScrollView, Pressable, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -9,6 +9,8 @@ import { ClosetStackScreenProps } from "../types/navigation";
 import ClothingItemThumbnail from "../components/clothing/ClothingItemThumbnail";
 import AnimatedAddButton from "../components/common/AnimatedAddButton";
 import TagFilterSection from "../components/common/TagFilterSection";
+import DeleteModeHeader from "../components/clothing/DeleteModeHeader";
+import DeleteButton from "../components/clothing/DeleteButton";
 import { categories } from "../data/categories";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -34,11 +36,81 @@ const CategoryTab = ({ name, isSelected, onPress, count }: CategoryTabProps) => 
 const ClothingManagementScreen = ({ navigation }: Props) => {
   const context = useContext(ClothingContext);
 
+  // Selection state
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
   if (!context) {
     return <Text>Loading...</Text>;
   }
 
-  const { categoryData, tagData, filteredItems, activeFilters, setFilter, addClothingItemFromImage } = context;
+  const {
+    categoryData,
+    tagData,
+    filteredItems,
+    activeFilters,
+    setFilter,
+    addClothingItemFromImage,
+    deleteClothingItem,
+  } = context;
+
+  // Selection handlers
+  const handleLongPress = useCallback((itemId: string) => {
+    setIsSelectionMode(true);
+    setSelectedItems(new Set([itemId]));
+  }, []);
+
+  const handleItemPress = useCallback(
+    (itemId: string) => {
+      if (isSelectionMode) {
+        setSelectedItems((prev) => {
+          const newSet = new Set(prev);
+          if (newSet.has(itemId)) {
+            newSet.delete(itemId);
+            // If no items are selected, exit selection mode
+            if (newSet.size === 0) {
+              setIsSelectionMode(false);
+            }
+          } else {
+            newSet.add(itemId);
+          }
+          return newSet;
+        });
+      } else {
+        navigation.navigate("ClothingDetail", { id: itemId });
+      }
+    },
+    [isSelectionMode, navigation]
+  );
+
+  const handleCancelSelection = useCallback(() => {
+    setIsSelectionMode(false);
+    setSelectedItems(new Set());
+  }, []);
+
+  const handleDelete = useCallback(() => {
+    Alert.alert(
+      "Delete Items",
+      `Are you sure you want to delete ${selectedItems.size} item${selectedItems.size > 1 ? "s" : ""}?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            selectedItems.forEach((id) => {
+              deleteClothingItem(id);
+            });
+            setIsSelectionMode(false);
+            setSelectedItems(new Set());
+          },
+        },
+      ]
+    );
+  }, [selectedItems, deleteClothingItem]);
 
   const handleAddClothingItem = async (imageUri: string) => {
     try {
@@ -93,7 +165,13 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
   };
 
   const renderItem = ({ item }: { item: ClothingItem }) => (
-    <ClothingItemThumbnail item={item} onPress={() => navigation.navigate("ClothingDetail", { id: item.id })} />
+    <ClothingItemThumbnail
+      item={item}
+      onPress={() => handleItemPress(item.id)}
+      onLongPress={() => handleLongPress(item.id)}
+      isSelectable={isSelectionMode}
+      isSelected={selectedItems.has(item.id)}
+    />
   );
 
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
@@ -101,12 +179,16 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>My Closet</Text>
-        <Pressable style={styles.filterButton}>
-          <MaterialIcons name="filter-list" size={24} color={colors.icon_stroke} />
-        </Pressable>
-      </View>
+      {isSelectionMode ? (
+        <DeleteModeHeader selectedCount={selectedItems.size} onCancel={handleCancelSelection} />
+      ) : (
+        <View style={styles.header}>
+          <Text style={styles.title}>My Closet</Text>
+          <Pressable>
+            <MaterialIcons name="filter-list" size={24} color={colors.icon_stroke} />
+          </Pressable>
+        </View>
+      )}
 
       {/* Category Tabs */}
       <ScrollView
@@ -141,11 +223,15 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={3}
-        contentContainerStyle={styles.gridContent}
+        contentContainerStyle={[styles.gridContent, isSelectionMode && styles.gridContentWithDelete]}
       />
 
-      {/* Add Button */}
-      <AnimatedAddButton onChoosePhoto={handleChoosePhoto} onTakePhoto={handleTakePhoto} />
+      {/* Add Button or Delete Button */}
+      {isSelectionMode ? (
+        <DeleteButton onDelete={handleDelete} selectedCount={selectedItems.size} />
+      ) : (
+        <AnimatedAddButton onChoosePhoto={handleChoosePhoto} onTakePhoto={handleTakePhoto} />
+      )}
     </SafeAreaView>
   );
 };
@@ -167,9 +253,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: typography.bold,
     color: colors.text_primary,
-  },
-  filterButton: {
-    padding: 8,
   },
   categoryTabsContainer: {
     maxHeight: 48,
@@ -209,6 +292,9 @@ const styles = StyleSheet.create({
   gridContent: {
     paddingTop: 6,
     paddingHorizontal: 10,
+  },
+  gridContentWithDelete: {
+    paddingBottom: 80,
   },
 });
 

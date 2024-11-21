@@ -21,4 +21,6 @@ export const colors = {
   divider_light: "#DDDDDD",
   border_gray: "#D3D3D3",
   border_gray_light: "#E0E0E0",
+
+  primary_red: "#FF2000",
 };

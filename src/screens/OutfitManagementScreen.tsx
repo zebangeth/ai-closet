@@ -59,7 +59,7 @@ const OutfitManagementScreen = ({ navigation }: Props) => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>My Outfits</Text>
-        <Pressable style={styles.filterButton}>
+        <Pressable>
           <MaterialIcons name="filter-list" size={24} color={colors.icon_stroke} />
         </Pressable>
       </View>
@@ -99,9 +99,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: typography.bold,
     color: colors.text_primary,
-  },
-  filterButton: {
-    padding: 8,
   },
   gridContent: {
     padding: GRID_PADDING,
