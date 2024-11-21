@@ -13,7 +13,9 @@ const DeleteButton = ({ onDelete, selectedCount }: Props) => (
   <View style={styles.container}>
     <Pressable style={styles.button} onPress={onDelete}>
       <MaterialIcons name="delete" size={24} color={colors.screen_background} />
-      <Text style={styles.text}>Delete {selectedCount} items</Text>
+      <Text style={styles.text}>
+        Delete {selectedCount} item{selectedCount > 1 ? "s" : ""}
+      </Text>
     </Pressable>
   </View>
 );
