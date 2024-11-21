@@ -1,9 +1,8 @@
-import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, FlatList, ScrollView, Pressable, Alert, ActivityIndicator } from "react-native";
+import React, { useContext } from "react";
+import { View, Text, StyleSheet, FlatList, ScrollView, Pressable, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { v4 as uuidv4 } from "uuid";
 import { ClothingContext } from "../contexts/ClothingContext";
 import { ClothingItem } from "../types/ClothingItem";
 import { ClosetStackScreenProps } from "../types/navigation";
@@ -13,8 +12,6 @@ import TagFilterSection from "../components/common/TagFilterSection";
 import { categories } from "../data/categories";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
-import { removeBackground } from "../services/BackgroundRemoval";
-import { categorizeClothing } from "../services/ClothingCategorization";
 
 type Props = ClosetStackScreenProps<"ClothingManagement">;
 
@@ -36,13 +33,25 @@ const CategoryTab = ({ name, isSelected, onPress, count }: CategoryTabProps) => 
 // Main Component
 const ClothingManagementScreen = ({ navigation }: Props) => {
   const context = useContext(ClothingContext);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   if (!context) {
     return <Text>Loading...</Text>;
   }
 
-  const { categoryData, tagData, filteredItems, activeFilters, setFilter, addClothingItem } = context;
+  const { categoryData, tagData, filteredItems, activeFilters, setFilter, addClothingItemFromImage } = context;
+
+  const handleAddClothingItem = async (imageUri: string) => {
+    try {
+      // Add the item immediately and get its ID
+      const newItemId = await addClothingItemFromImage(imageUri);
+
+      // Navigate to the detail screen right away
+      navigation.navigate("ClothingDetail", { id: newItemId });
+    } catch (error) {
+      console.error("Error adding clothing item:", error);
+      Alert.alert("Error", "Failed to add clothing item. Please try again.");
+    }
+  };
 
   const handleChoosePhoto = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -51,9 +60,13 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync();
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
     if (!result.canceled) {
-      processImage(result.assets[0].uri);
+      handleAddClothingItem(result.assets[0].uri);
     }
   };
 
@@ -64,47 +77,12 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
       return;
     }
 
-    const result = await ImagePicker.launchCameraAsync();
+    const result = await ImagePicker.launchCameraAsync({
+      quality: 1,
+    });
+
     if (!result.canceled) {
-      processImage(result.assets[0].uri);
-    }
-  };
-
-  const processImage = async (uri: string) => {
-    try {
-      setIsProcessing(true);
-
-      // Step 1: Run background removal and categorization
-      const [bgRemovedUri, aiData] = await Promise.all([removeBackground(uri), categorizeClothing(uri)]);
-
-      // Step 2: Create a new ClothingItem
-      const newItem: ClothingItem = {
-        id: uuidv4(),
-        imageUri: uri,
-        backgroundRemovedImageUri: bgRemovedUri,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        tags: [],
-        category: aiData.category || "",
-        subcategory: aiData.subcategory || "",
-        color: aiData.color || [],
-        season: aiData.season || [],
-        occasion: aiData.occasion || [],
-        brand: "",
-        purchaseDate: "",
-        price: 0,
-      };
-
-      // Step 3: Add the new clothing item to context
-      addClothingItem(newItem);
-
-      // Step 4: Navigate to the detail screen
-      navigation.navigate("ClothingDetail", { id: newItem.id });
-    } catch (error) {
-      console.error("Error processing image:", error);
-      Alert.alert("Error", "An error occurred while processing the image.");
-    } finally {
-      setIsProcessing(false);
+      handleAddClothingItem(result.assets[0].uri);
     }
   };
 
@@ -168,14 +146,6 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
 
       {/* Add Button */}
       <AnimatedAddButton onChoosePhoto={handleChoosePhoto} onTakePhoto={handleTakePhoto} />
-
-      {/* Loading Overlay */}
-      {isProcessing && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={colors.primary_yellow} />
-          <Text style={styles.loadingText}>Processing image...</Text>
-        </View>
-      )}
     </SafeAreaView>
   );
 };
@@ -239,22 +209,6 @@ const styles = StyleSheet.create({
   gridContent: {
     paddingTop: 6,
     paddingHorizontal: 10,
-  },
-  loadingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: colors.background_dim,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 16,
-    color: "#fff",
-    fontSize: 18,
-    fontFamily: typography.medium,
   },
 });
 

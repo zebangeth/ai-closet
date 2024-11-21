@@ -1,7 +1,10 @@
 import React, { createContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
-import { ClothingItem } from "../types/ClothingItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { v4 as uuidv4 } from "uuid";
+import { ClothingItem, createNewClothingItem } from "../types/ClothingItem";
 import { categories } from "../data/categories";
+import { removeBackground } from "../services/BackgroundRemoval";
+import { categorizeClothing } from "../services/ClothingCategorization";
 
 type CategoryCounts = {
   All: number;
@@ -18,6 +21,17 @@ type ClothingFilters = {
   tags?: string[];
 };
 
+type ProcessingError = {
+  message: string;
+  code?: string;
+};
+
+type ProcessingCallbacks = {
+  onBackgroundRemovalComplete?: () => void;
+  onCategorizationComplete?: () => void;
+  onError?: (error: ProcessingError) => void;
+};
+
 type ClothingContextType = {
   // Data
   clothingItems: ClothingItem[];
@@ -32,7 +46,7 @@ type ClothingContextType = {
 
   // CRUD operations
   getClothingItem: (id: string) => ClothingItem | undefined;
-  addClothingItem: (item: ClothingItem) => void;
+  addClothingItemFromImage: (imageUri: string, callbacks?: ProcessingCallbacks) => Promise<string>; // Returns new item ID
   updateClothingItem: (item: ClothingItem) => void;
   deleteClothingItem: (id: string) => void;
 };
@@ -103,7 +117,7 @@ export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }
       .sort((a, b) => b.count - a.count);
   }, [clothingItems]);
 
-  // Memoized filtered items with optimized filtering
+  // Memoized filtered items
   const filteredItems = useMemo(() => {
     // Early return if no filters are active
     if (activeFilters.category === "All" && (!activeFilters.tags || activeFilters.tags.length === 0)) {
@@ -151,9 +165,167 @@ export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }
     [clothingItems]
   );
 
-  const addClothingItem = useCallback((item: ClothingItem) => {
-    setClothingItems((prev) => [...prev, item]);
-  }, []);
+  const addClothingItemFromImage = useCallback(
+    async (imageUri: string, callbacks?: ProcessingCallbacks): Promise<string> => {
+      // Create a new clothing item with initial state
+      const newItem = {
+        ...createNewClothingItem(imageUri),
+        id: uuidv4(),
+      };
+
+      // Add the item to state immediately
+      setClothingItems((prev) => [...prev, newItem]);
+
+      // Start background removal process
+      const processBackgroundRemoval = async () => {
+        try {
+          // Update status to processing
+          setClothingItems((prev) =>
+            prev.map((item) =>
+              item.id === newItem.id
+                ? {
+                    ...item,
+                    processingStatus: {
+                      ...item.processingStatus,
+                      backgroundRemoval: "processing",
+                    },
+                  }
+                : item
+            )
+          );
+
+          // Process the image
+          const backgroundRemovedImageUri = await removeBackground(imageUri);
+
+          // Update the item with the processed image
+          setClothingItems((prev) =>
+            prev.map((item) =>
+              item.id === newItem.id
+                ? {
+                    ...item,
+                    backgroundRemovedImageUri,
+                    processingStatus: {
+                      ...item.processingStatus,
+                      backgroundRemoval: "completed",
+                    },
+                  }
+                : item
+            )
+          );
+
+          callbacks?.onBackgroundRemovalComplete?.();
+        } catch (error) {
+          const processedError: ProcessingError = {
+            message: error instanceof Error ? error.message : "An unknown error occurred during background removal",
+            code: "BACKGROUND_REMOVAL_ERROR",
+          };
+
+          console.error("Background removal error:", processedError);
+
+          setClothingItems((prev) =>
+            prev.map((item) =>
+              item.id === newItem.id
+                ? {
+                    ...item,
+                    processingStatus: {
+                      ...item.processingStatus,
+                      backgroundRemoval: "error",
+                    },
+                    processingError: {
+                      ...item.processingError,
+                      backgroundRemoval: processedError.message,
+                    },
+                  }
+                : item
+            )
+          );
+
+          callbacks?.onError?.(processedError);
+        }
+      };
+
+      // Start categorization process
+      const processCategorization = async () => {
+        try {
+          // Update status to processing
+          setClothingItems((prev) =>
+            prev.map((item) =>
+              item.id === newItem.id
+                ? {
+                    ...item,
+                    processingStatus: {
+                      ...item.processingStatus,
+                      categorization: "processing",
+                    },
+                  }
+                : item
+            )
+          );
+
+          // Get AI categorization
+          const categoryData = await categorizeClothing(imageUri);
+
+          // Update the item with the categorization data
+          setClothingItems((prev) =>
+            prev.map((item) =>
+              item.id === newItem.id
+                ? {
+                    ...item,
+                    ...categoryData,
+                    processingStatus: {
+                      ...item.processingStatus,
+                      categorization: "completed",
+                    },
+                  }
+                : item
+            )
+          );
+
+          callbacks?.onCategorizationComplete?.();
+        } catch (error) {
+          const processedError: ProcessingError = {
+            message: error instanceof Error ? error.message : "An unknown error occurred during categorization",
+            code: "CATEGORIZATION_ERROR",
+          };
+
+          console.error("Categorization error:", processedError);
+
+          setClothingItems((prev) =>
+            prev.map((item) =>
+              item.id === newItem.id
+                ? {
+                    ...item,
+                    processingStatus: {
+                      ...item.processingStatus,
+                      categorization: "error",
+                    },
+                    processingError: {
+                      ...item.processingError,
+                      categorization: processedError.message,
+                    },
+                  }
+                : item
+            )
+          );
+
+          callbacks?.onError?.(processedError);
+        }
+      };
+
+      // Start both processes in parallel
+      Promise.all([processBackgroundRemoval(), processCategorization()]).catch((error) => {
+        const processedError: ProcessingError = {
+          message: error instanceof Error ? error.message : "An unknown error occurred",
+          code: "GENERAL_PROCESSING_ERROR",
+        };
+        console.error("Processing error:", processedError);
+        callbacks?.onError?.(processedError);
+      });
+
+      return newItem.id;
+    },
+    []
+  );
 
   const updateClothingItem = useCallback((updatedItem: ClothingItem) => {
     setClothingItems((prev) =>
@@ -179,7 +351,7 @@ export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     // CRUD operations
     getClothingItem,
-    addClothingItem,
+    addClothingItemFromImage,
     updateClothingItem,
     deleteClothingItem,
   };
