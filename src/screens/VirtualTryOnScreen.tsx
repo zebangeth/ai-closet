@@ -14,6 +14,8 @@ import { virtualTryOn } from "../services/VirtualTryOn";
 import { VirtualTryOnContext } from "../contexts/VirtualTryOnContext";
 import { VirtualTryOnItem } from "../types/VirtualTryOn";
 import { TryOnStackScreenProps } from "../types/navigation";
+import DeleteModeHeader from "../components/common/DeleteModeHeader";
+import DeleteButton from "../components/common/DeleteButton";
 
 type Props = TryOnStackScreenProps<"VirtualTryOn">;
 
@@ -24,12 +26,14 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [resultImageUri, setResultImageUri] = useState<string>();
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const tryOnContext = useContext(VirtualTryOnContext);
   if (!tryOnContext) {
     return null;
   }
-  const { recentTryOns, addTryOn } = tryOnContext;
+  const { recentTryOns, addTryOn, deleteHistoryItems } = tryOnContext;
 
   // Progress timer effect
   useEffect(() => {
@@ -133,16 +137,84 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
     setResultImageUri(item.resultImageUri);
   };
 
+  const handleLongPress = useCallback((item: VirtualTryOnItem) => {
+    setIsSelectionMode(true);
+    setSelectedItems(new Set([item.id]));
+  }, []);
+
+  const handleItemPress = useCallback(
+    (item: VirtualTryOnItem) => {
+      if (isSelectionMode) {
+        setSelectedItems((prev) => {
+          const newSet = new Set(prev);
+          if (newSet.has(item.id)) {
+            newSet.delete(item.id);
+            // If no items are selected, exit selection mode
+            if (newSet.size === 0) {
+              setIsSelectionMode(false);
+            }
+          } else {
+            newSet.add(item.id);
+          }
+          return newSet;
+        });
+      } else {
+        // Normal item press handler
+        setSelectedOutfitUri(item.newClothingImageUri);
+        setSelectedPhotoUri(item.userPhotoUri);
+        setResultImageUri(item.resultImageUri);
+      }
+    },
+    [isSelectionMode]
+  );
+
+  const handleCancelSelection = useCallback(() => {
+    setIsSelectionMode(false);
+    setSelectedItems(new Set());
+  }, []);
+
+  const handleDelete = useCallback(() => {
+    Alert.alert(
+      "Delete History",
+      `Are you sure you want to delete ${selectedItems.size} item${
+        selectedItems.size > 1 ? "s" : ""
+      } from your try-on history?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteHistoryItems(selectedItems);
+              setIsSelectionMode(false);
+              setSelectedItems(new Set());
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete items. Please try again.");
+            }
+          },
+        },
+      ]
+    );
+  }, [selectedItems, deleteHistoryItems]);
+
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Virtual Try-On</Text>
-      </View>
+      {isSelectionMode ? (
+        <DeleteModeHeader selectedCount={selectedItems.size} onCancel={handleCancelSelection} />
+      ) : (
+        <View style={styles.header}>
+          <Text style={styles.title}>Virtual Try-On</Text>
+        </View>
+      )}
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={[styles.content, isSelectionMode && styles.contentWithDelete]}>
         {/* Instructions */}
         <Text style={styles.instructions}>Select an outfit and upload your photo to see how it looks on you</Text>
 
@@ -200,8 +272,19 @@ const VirtualTryOnScreen = ({ navigation }: Props) => {
         )}
 
         {/* Recently Tried Section */}
-        {recentTryOns.length > 0 && <RecentlyTriedSection items={recentTryOns} onItemPress={handleRecentItemPress} />}
+        {recentTryOns.length > 0 && (
+          <RecentlyTriedSection
+            items={recentTryOns}
+            onItemPress={handleItemPress}
+            onItemLongPress={handleLongPress}
+            isSelectionMode={isSelectionMode}
+            selectedItems={selectedItems}
+          />
+        )}
       </ScrollView>
+
+      {/* Delete Button */}
+      {isSelectionMode && <DeleteButton onDelete={handleDelete} selectedCount={selectedItems.size} />}
 
       <TryOnOptionSheet
         isVisible={isOptionSheetVisible}
@@ -288,6 +371,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: typography.medium,
     color: colors.text_primary,
+  },
+  contentWithDelete: {
+    paddingBottom: 80,
   },
 });
 
