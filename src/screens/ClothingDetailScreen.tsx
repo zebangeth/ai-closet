@@ -22,6 +22,7 @@ import Header from "../components/common/Header";
 import CategoryPicker from "../components/common/CategoryPicker";
 import MultiSelectToggle from "../components/common/MultiSelectToggle";
 import YearMonthPicker from "../components/common/YearMonthPicker";
+import RelevantOutfits from "../components/clothing/RelevantOutfits";
 import { colors as colorOptions, seasons, occasions } from "../data/options";
 import { brands as brandSuggestions } from "../data/suggestions";
 import { typography } from "../styles/globalStyles";
@@ -233,6 +234,15 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
     setIsDirty(true);
   };
 
+  // Handle outfit press in relevant outfits section to navigate to outfit detail
+  const handleOutfitPress = (outfitId: string) => {
+    // Get the root navigation and navigate to the outfit stack
+    navigation.getParent()?.navigate("Outfits", {
+      screen: "OutfitDetail",
+      params: { id: outfitId },
+    });
+  };
+
   // Remove SafeAreaView for the top edge in modal mode
   const safeAreaEdges: Edge[] = isModal ? ["left", "right"] : ["top", "left", "right"];
 
@@ -285,6 +295,9 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
               }}
             />
           </View>
+
+          {/* Relevant Outfits Section */}
+          <RelevantOutfits clothingItemId={id} onOutfitPress={handleOutfitPress} />
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Item Details</Text>
