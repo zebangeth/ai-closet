@@ -2,9 +2,14 @@ import React, { useContext, useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/navigation";
 import { OutfitContext } from "../contexts/OutfitContext";
-import { OutfitStackScreenProps } from "../types/navigation";
+import {
+  OutfitStackScreenProps,
+  RootStackScreenProps,
+  RootStackParamList,
+  MainTabParamList,
+  OutfitStackParamList,
+} from "../types/navigation";
 import { Outfit } from "../types/Outfit";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -17,9 +22,11 @@ import ClothingItemThumbnail from "../components/clothing/ClothingItemThumbnail"
 import { ClothingContext } from "../contexts/ClothingContext";
 import PressableFade from "../components/common/PressableFade";
 
-type Props = OutfitStackScreenProps<"OutfitDetail">;
+type Props = OutfitStackScreenProps<"OutfitDetail"> | RootStackScreenProps<"OutfitDetailModal">;
 
 const OutfitDetailScreen = ({ route, navigation }: Props) => {
+  const isModal = route.name === "OutfitDetailModal";
+
   const { id } = route.params;
   const outfitContext = useContext(OutfitContext);
   const clothingContext = useContext(ClothingContext);
@@ -84,7 +91,12 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
   };
 
   const handleEditOutfit = () => {
-    navigation.navigate("OutfitCanvas", { id });
+    if (!isModal) {
+      // If not in modal, we can directly navigate within the outfit stack
+      (navigation as NativeStackNavigationProp<OutfitStackParamList>).navigate("OutfitCanvas", {
+        id,
+      });
+    }
   };
 
   const handleClothingItemPress = (itemId: string) => {
@@ -126,16 +138,18 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
         {/* Main outfit image section */}
         <View style={styles.imageContainer}>
           <Image source={{ uri: localOutfit.imageUri }} style={styles.image} resizeMode="contain" />
-          <PressableFade
-            containerStyle={styles.editButtonContainer}
-            style={styles.editButton}
-            onPress={handleEditOutfit}
-          >
-            <View style={styles.editButtonContent}>
-              <MaterialIcons name="edit" size={20} color={colors.text_primary} />
-              <Text style={styles.editButtonText}>Edit Outfit</Text>
-            </View>
-          </PressableFade>
+          {!isModal && ( // Only show edit button if not in modal
+            <PressableFade
+              containerStyle={styles.editButtonContainer}
+              style={styles.editButton}
+              onPress={handleEditOutfit}
+            >
+              <View style={styles.editButtonContent}>
+                <MaterialIcons name="edit" size={20} color={colors.text_primary} />
+                <Text style={styles.editButtonText}>Edit Outfit</Text>
+              </View>
+            </PressableFade>
+          )}
         </View>
 
         {/* Tags section */}

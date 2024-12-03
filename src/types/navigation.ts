@@ -3,8 +3,9 @@ import { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/n
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
 export type RootStackParamList = {
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList>;
   ClothingDetailModal: { id: string };
+  OutfitDetailModal: { id: string };
   SelectOutfitModal: undefined;
 };
 
@@ -52,3 +53,7 @@ export type TryOnStackScreenProps<T extends keyof TryOnStackParamList> = Composi
   NativeStackScreenProps<TryOnStackParamList, T>,
   CompositeScreenProps<BottomTabScreenProps<MainTabParamList>, NativeStackScreenProps<RootStackParamList>>
 >;
+
+export type OutfitDetailScreenProps =
+  | OutfitStackScreenProps<"OutfitDetail">
+  | RootStackScreenProps<"OutfitDetailModal">;

@@ -102,6 +102,7 @@ const AppNavigator = () => {
         <RootStack.Screen name="MainTabs" component={MainTabNavigator} />
         <RootStack.Group screenOptions={{ presentation: "modal" }}>
           <RootStack.Screen name="ClothingDetailModal" component={ClothingDetailScreen} />
+          <RootStack.Screen name="OutfitDetailModal" component={OutfitDetailScreen} />
         </RootStack.Group>
       </RootStack.Navigator>
     </NavigationContainer>

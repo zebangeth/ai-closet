@@ -11,6 +11,8 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types/navigation";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ClothingContext } from "../contexts/ClothingContext";
 import { ClosetStackScreenProps, RootStackScreenProps } from "../types/navigation";
@@ -236,11 +238,10 @@ const ClothingDetailScreen = ({ route, navigation }: Props) => {
 
   // Handle outfit press in relevant outfits section to navigate to outfit detail
   const handleOutfitPress = (outfitId: string) => {
-    // Get the root navigation and navigate to the outfit stack
-    navigation.getParent()?.navigate("Outfits", {
-      screen: "OutfitDetail",
-      params: { id: outfitId },
-    });
+    // Get the root navigation and navigate to the modal
+    navigation
+      .getParent<NativeStackNavigationProp<RootStackParamList>>()
+      ?.navigate("OutfitDetailModal", { id: outfitId });
   };
 
   // Remove SafeAreaView for the top edge in modal mode
