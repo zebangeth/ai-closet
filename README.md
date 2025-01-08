@@ -17,17 +17,24 @@ The app is built with React Native and Expo, offering a cross-platform solution 
 ## Key Features
 
 [Screenshot placeholder: All Clothing Items screen]
+![All Clothing Items screen](release_assets/all_clothes.png)
+![Clothing Item Details screen](release_assets/clothes_detail.png)
+
 1. **Add & Manage Clothing Items**  
    - Easily add clothing items from the camera or gallery. 
    - AI automatically removes backgrounds and assigns attributes (e.g., category, color, season).
 
 [Screenshot placeholder: All Clothing Items screen]
+![All Outfits screen](release_assets/all_outfits.png)
+![Outfit Canvas screen](release_assets/outfit_canvas.png)
+
 2. **Create & Save Outfits**
    - Mix and match items on a freeform canvas, drag-and-drop items to arrange the perfect look.
    - Store finished outfits and revisit them anytime to make updates or get inspiration.
    - Each clothing item lists the outfits it belongs to.
 
 [Screenshot placeholder: All Clothing Items screen]
+![Virtual Try-On screen](release_assets/vton.png)
 3. **Virtual Try-On**  
    - Upload a personal photo and let the AI generate an approximate look of how a clothing item or outfit appears on you.
    - Keep track of previous try-on sessions to revisit or share them later.
