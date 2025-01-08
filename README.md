@@ -1,6 +1,6 @@
 # AI Closet
 
-*Thank you for checking out AI Closet! If you find it useful or interesting, consider giving this repository a star. It helps others discover the project too.*
+> *Thank you for checking out AI Closet! If you find it useful or interesting, consider giving this repository a star. It helps others discover the project too.*
 
 [**Hero Image / Banner Placeholder**]
 
@@ -16,15 +16,13 @@ The app is built with React Native and Expo, offering a cross-platform solution 
 
 ## Key Features
 
-*available in the current release:*
-
 [Screenshot placeholder: All Clothing Items screen]
 1. **Add & Manage Clothing Items**  
    - Easily add clothing items from the camera or gallery. 
    - AI automatically removes backgrounds and assigns attributes (e.g., category, color, season).
 
 [Screenshot placeholder: All Clothing Items screen]
-2. **Create & Save Outfits**  
+2. **Create & Save Outfits**
    - Mix and match items on a freeform canvas, drag-and-drop items to arrange the perfect look.
    - Store finished outfits and revisit them anytime to make updates or get inspiration.
    - Each clothing item lists the outfits it belongs to.
@@ -85,7 +83,7 @@ The app is built with React Native and Expo, offering a cross-platform solution 
 
 ## Architecture and Future Roadmap
 
-[Image Placeholder: High-level architecture diagram (including both client and future cloud components)]
+![Architecture Diagram (including both client and future cloud components)](release_assets/system_arch.png)
 
 ### Current Implementation (Client-Side)
 1. **UI Layer**: Built with React Native to support iOS and Android.
