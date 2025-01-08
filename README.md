@@ -22,7 +22,7 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
 
 ---
 
-#### Key Features
+## Key Features
 
 <table>
   <tr>
@@ -33,11 +33,11 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
         <li>AI automatically removes backgrounds and assigns attributes (e.g., category, color, season).</li>
       </ul>
     </td>
-    <td width="33%" height="400px" align="center">
-      <img src="release_assets/all_clothes.png" alt="All Clothing Items screen" style="max-width:100%;">
+    <td width="33%" align="center">
+      <img src="release_assets/all_clothes.png" alt="All Clothing Items screen" style="max-width:100%; max-height:400px;">
     </td>
-    <td width="33%" height="400px" align="center">
-      <img src="release_assets/clothes_detail.png" alt="Clothing Item Details screen" style="max-width:100%;">
+    <td width="33%" align="center">
+      <img src="release_assets/clothes_detail.png" alt="Clothing Item Details screen" style="max-width:100%; max-height:400px;">
     </td>
   </tr>
 </table>
@@ -54,11 +54,11 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
         <li>Each clothing item lists the outfits it belongs to.</li>
       </ul>
     </td>
-    <td width="33%" height="400px" align="center">
-      <img src="release_assets/all_outfits.png" alt="All Outfits screen" style="max-width:100%;">
+    <td width="33%" align="center">
+      <img src="release_assets/all_outfits.png" alt="All Outfits screen" style="max-width:100%; max-height:400px;">
     </td>
-    <td width="33%" height="400px" align="center">
-      <img src="release_assets/outfit_canvas.png" alt="Outfit Canvas screen" style="max-width:100%;">
+    <td width="33%" align="center">
+      <img src="release_assets/outfit_canvas.png" alt="Outfit Canvas screen" style="max-width:100%; max-height:400px;">
     </td>
   </tr>
 </table>
@@ -74,15 +74,16 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
         <li>Keep track of previous try-on sessions to revisit or share later.</li>
       </ul>
     </td>
-    <td width="50%" height="400px" align="center">
-      <img src="release_assets/vton.png" alt="Virtual Try-On screen" style="max-width:100%;">
+    <td width="50%" align="center">
+      <img src="release_assets/vton.png" alt="Virtual Try-On screen" style="max-width:100%; max-height:400px;">
     </td>
   </tr>
 </table>
 
+
 ---
 
-#### Tech Stack
+## Tech Stack
 
 <div>
   <ul>
@@ -95,7 +96,7 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
 
 ---
 
-#### Installation and Usage
+## Installation and Usage
 
 1. **Clone the Repository:**
    ```shell
@@ -127,19 +128,19 @@ The app should now be running on your local machine. You can access it via the E
 
 ---
 
-#### Architecture and Future Roadmap
+## Architecture and Future Roadmap
 
 <div align="center">
   <img src="release_assets/system_arch.png" alt="System Architecture Diagram" width="80%" />
   <p><em>Architecture Diagram (including both client and future cloud components)</em></p>
 </div>
 
-##### Current Implementation (Client-Side)
+### Current Implementation (Client-Side)
 1. **UI Layer** – Built with React Native to support iOS and Android.  
 2. **State Management Layer** – Powered by React Context API for global state.  
 3. **Data Layer** – Uses AsyncStorage and <code>expo-file-system</code> for metadata and image storage.
 
-##### Planned Cloud Components
+### Planned Cloud Components
 1. **API Gateway** – Securely proxy API requests while hiding and protecting sensitive API keys.  
 2. **Rate Limiting System** – AWS Lambda checks user credits before forwarding API requests; logs transactions in DynamoDB.  
 3. **AI Services** – Current third-party AI services will move behind a proxy to enforce rate limits and protect API keys.
@@ -148,7 +149,7 @@ The app should now be running on your local machine. You can access it via the E
 
 Refer to the [design_doc](/design_doc.md) for more details on the current architecture.
 
-#### Future Features
+## Future Features
 - **Batch Clothing Upload**: Add multiple clothing items at once for faster initial closet setup.
 - **Social Sharing & Export**: Easily share outfits to social media or with friends.
 - **User Onboarding Screens**: Introduce new users to the app and its features.
@@ -159,13 +160,13 @@ Refer to the [design_doc](/design_doc.md) for more details on the current archit
 
 ---
 
-#### Productization Considerations
+## Productization Considerations
 
 <div>
   <p>One key differentiator of AI Closet is the <strong>integrated virtual try-on plus wardrobe management</strong> — an all-in-one approach compared to many closet-only or try-on-only apps.</p>
 </div>
 
-##### Cost Estimation
+### Cost Estimation
 
 | Service                                 | Cost/Usage      |
 |-----------------------------------------|-----------------|
@@ -188,19 +189,19 @@ The backend AWS cost is minimal, but are crucial for implementing secure credit-
 
 ---
 
-#### Contributing
+## Contributing
 
 Contributions are appreciated! Whether it’s a bug fix, new feature proposal, or performance optimization. For major changes, please open an issue first to discuss what you’d like to change. This ensures alignment and helps us provide guidance.
 
 ---
 
-#### License
+## License
 
 This project is licensed under the **MIT License**.
 
 ---
 
-#### Contact & Support
+## Contact & Support
 
 - **Issues / Bug Reports**: Please use the [GitHub Issues](#) tab for bugs or feature requests.  
 - **Questions / Suggestions**: Feel free to start a discussion in the [Discussions](#) tab.
