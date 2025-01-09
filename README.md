@@ -24,7 +24,7 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
 
 ## Key Features
 
-<table>
+<table max-height="400px">
   <tr>
     <td width="33%">
       <strong>Add &amp; Manage Clothing Items</strong><br />
@@ -44,7 +44,7 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
 
 <br />
 
-<table>
+<table max-height="400px">
   <tr>
     <td width="33%">
       <strong>Create &amp; Save Outfits</strong><br />
@@ -65,7 +65,7 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
 
 <br />
 
-<table>
+<table max-height="400px">
   <tr>
     <td width="50%">
       <strong>Virtual Try-On</strong><br />
