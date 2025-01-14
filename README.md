@@ -111,9 +111,9 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
 
 3. **Configure Environment:**  
    - The AI features require require the following APIs and keys, add them to your environment variables:
-   - OpenAI API: for auto categorization and tagging
-   - FalAI AI: for background removal
-   - Kwai: for virtual try-on
+      - OpenAI API: for auto categorization and tagging
+      - fal.ai API: for background removal
+      - Kwai Kolors API: for virtual try-on
    ```shell
    EXPO_PUBLIC_OPENAI_KEY = ""
    EXPO_PUBLIC_FAL_KEY = ""
